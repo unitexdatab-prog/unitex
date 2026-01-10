@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { FiExternalLink } from 'react-icons/fi';
+import { FiBookmark, FiExternalLink, FiMoreHorizontal, FiMessageCircle, FiHeart, FiShare2 } from 'react-icons/fi';
 
 const PostCard = ({ post, onSave }) => {
     const formatDate = (dateString) => {
@@ -21,108 +21,138 @@ const PostCard = ({ post, onSave }) => {
         <motion.article
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-            className="post-card"
+            className="card"
+            style={{ padding: 0, overflow: 'hidden' }}
         >
-            {/* Header */}
-            <header className="post-header">
-                <div className="avatar">
-                    {post.author_avatar ? (
-                        <img src={post.author_avatar} alt={post.author_name} />
-                    ) : (
-                        post.author_name?.charAt(0).toUpperCase()
-                    )}
+            <div style={{ padding: '24px' }}>
+                {/* Header */}
+                <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
+                    <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+                        <div className="avatar-ring" style={{ width: 44, height: 44 }}>
+                            {post.author_avatar ? (
+                                <img src={post.author_avatar} alt={post.author_name} className="avatar" />
+                            ) : (
+                                <div className="avatar" style={{ background: 'var(--color-obsidian)', color: '#FFF', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                    {post.author_name?.charAt(0).toUpperCase()}
+                                </div>
+                            )}
+                        </div>
+                        <div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{post.author_name}</span>
+                                {post.space_name && (
+                                    <span className="badge" style={{ fontSize: 10 }}>{post.space_name}</span>
+                                )}
+                            </div>
+                            <div style={{ fontSize: 13, color: 'var(--text-tertiary)' }}>
+                                {formatDate(post.created_at)}
+                            </div>
+                        </div>
+                    </div>
+                    <button className="btn-icon" style={{ color: 'var(--text-tertiary)', background: 'transparent', border: 'none', cursor: 'pointer' }}>
+                        <FiMoreHorizontal size={20} />
+                    </button>
+                </header>
+
+                {/* Content */}
+                <div style={{ marginBottom: 20 }}>
+                    <p style={{
+                        fontSize: '1rem',
+                        lineHeight: 1.6,
+                        color: 'var(--text-primary)',
+                        whiteSpace: 'pre-wrap'
+                    }}>
+                        {post.content}
+                    </p>
                 </div>
-                <div className="post-meta" style={{ flex: 1 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                        <span className="post-author">{post.author_name}</span>
-                        {post.space_name && (
-                            <span className="tag" style={{ fontSize: 10 }}>
-                                {post.space_name}
-                            </span>
+
+                {/* Attachment */}
+                {post.artifact_url && (
+                    <div style={{
+                        marginBottom: 20,
+                        borderRadius: 'var(--radius-soft)',
+                        overflow: 'hidden',
+                        border: '1px solid var(--border-subtle)'
+                    }}>
+                        {post.artifact_type === 'image' ? (
+                            <img src={post.artifact_url} alt="Post attachment" style={{ width: '100%', display: 'block' }} />
+                        ) : (
+                            <a
+                                href={post.artifact_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 12,
+                                    padding: 16,
+                                    background: 'var(--bg-app)',
+                                    textDecoration: 'none',
+                                    color: 'var(--text-primary)'
+                                }}
+                            >
+                                <div style={{
+                                    width: 40,
+                                    height: 40,
+                                    borderRadius: 8,
+                                    background: 'rgba(166, 139, 91, 0.1)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    color: 'var(--color-gold-buff)'
+                                }}>
+                                    <FiExternalLink size={20} />
+                                </div>
+                                <span style={{ fontWeight: 500 }}>View Attachment</span>
+                            </a>
                         )}
                     </div>
-                    <span className="post-time">
-                        @{post.author_user_id} · {formatDate(post.created_at)}
-                    </span>
-                </div>
-            </header>
+                )}
 
-            {/* Content */}
-            <div className="post-content">
-                <p style={{
-                    fontSize: 16,
-                    lineHeight: 1.75,
-                    color: 'var(--charcoal)',
-                    whiteSpace: 'pre-wrap'
+                {/* Actions */}
+                <footer style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    paddingTop: 16,
+                    borderTop: '1px solid var(--border-subtle)'
                 }}>
-                    {post.content}
-                </p>
-            </div>
+                    <div style={{ display: 'flex', gap: 24 }}>
+                        <button style={{ background: 'transparent', border: 'none', display: 'flex', alignItems: 'center', gap: 6, color: 'var(--text-secondary)', cursor: 'pointer' }}>
+                            <FiHeart size={20} />
+                            <span style={{ fontSize: 13, fontWeight: 500 }}>Like</span>
+                        </button>
+                        <button style={{ background: 'transparent', border: 'none', display: 'flex', alignItems: 'center', gap: 6, color: 'var(--text-secondary)', cursor: 'pointer' }}>
+                            <FiMessageCircle size={20} />
+                            <span style={{ fontSize: 13, fontWeight: 500 }}>Comment</span>
+                        </button>
+                        <button style={{ background: 'transparent', border: 'none', display: 'flex', alignItems: 'center', gap: 6, color: 'var(--text-secondary)', cursor: 'pointer' }}>
+                            <FiShare2 size={20} />
+                            <span style={{ fontSize: 13, fontWeight: 500 }}>Share</span>
+                        </button>
+                    </div>
 
-            {/* Artifact */}
-            {post.artifact_url && (
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    style={{
-                        marginTop: 20,
-                        background: 'var(--sand)',
-                        borderRadius: 16,
-                        overflow: 'hidden'
-                    }}
-                >
-                    {post.artifact_type === 'image' ? (
-                        <img
-                            src={post.artifact_url}
-                            alt="Attachment"
+                    {onSave && (
+                        <button
+                            onClick={() => onSave(post.id)}
                             style={{
-                                width: '100%',
-                                maxHeight: 400,
-                                objectFit: 'cover'
-                            }}
-                        />
-                    ) : (
-                        <a
-                            href={post.artifact_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style={{
+                                background: 'transparent',
+                                border: 'none',
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: 8,
-                                padding: 16,
-                                color: 'var(--gold)',
-                                fontWeight: 500
+                                gap: 6,
+                                color: 'var(--text-tertiary)',
+                                cursor: 'pointer',
+                                transition: 'color 0.2s'
                             }}
+                            onMouseEnter={(e) => e.target.style.color = 'var(--color-gold-buff)'}
+                            onMouseLeave={(e) => e.target.style.color = 'var(--text-tertiary)'}
                         >
-                            <FiExternalLink size={16} />
-                            View Attachment
-                        </a>
+                            <FiBookmark size={20} />
+                        </button>
                     )}
-                </motion.div>
-            )}
-
-            {/* Footer Actions */}
-            <footer style={{
-                marginTop: 20,
-                paddingTop: 16,
-                borderTop: '1px solid var(--sand)',
-                display: 'flex',
-                justifyContent: 'flex-end'
-            }}>
-                {onSave && (
-                    <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => onSave(post.id)}
-                        className="btn btn-ghost"
-                        style={{ fontSize: 13 }}
-                    >
-                        Save to Vault
-                    </motion.button>
-                )}
-            </footer>
+                </footer>
+            </div>
         </motion.article>
     );
 };

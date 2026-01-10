@@ -1,45 +1,37 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { motion } from 'framer-motion';
-import { FiSend, FiImage } from 'react-icons/fi';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FiSend, FiImage, FiSmile } from 'react-icons/fi';
 
-const CreatePost = ({ onPostCreated, spaceId = null }) => {
-    const { user, getAuthHeader } = useAuth();
+const CreatePost = ({ onPostCreated, spaceId }) => {
+    const { getAuthHeader } = useAuth();
     const [content, setContent] = useState('');
+    const [isExpanded, setIsExpanded] = useState(false);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
-    const [isFocused, setIsFocused] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!content.trim()) return;
 
         setLoading(true);
-        setError('');
-
         try {
             const response = await fetch('/api/posts', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...getAuthHeader()
-                },
-                body: JSON.stringify({ content, spaceId })
+                headers: getAuthHeader(),
+                body: JSON.stringify({
+                    content,
+                    space_id: spaceId
+                })
             });
 
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error || 'Failed to create post');
+            if (response.ok) {
+                const newPost = await response.json();
+                onPostCreated(newPost);
+                setContent('');
+                setIsExpanded(false);
             }
-
-            setContent('');
-            setIsFocused(false);
-            if (onPostCreated) {
-                onPostCreated(data);
-            }
-        } catch (err) {
-            setError(err.message);
+        } catch (error) {
+            console.error('Failed to create post:', error);
         } finally {
             setLoading(false);
         }
@@ -47,102 +39,79 @@ const CreatePost = ({ onPostCreated, spaceId = null }) => {
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.25, duration: 0.5 }}
+            layout
             className="card"
-            style={{
-                marginBottom: 32,
-                background: 'var(--ivory)',
-                border: isFocused ? '2px solid var(--gold)' : '2px solid transparent',
-                transition: 'border-color 200ms ease'
-            }}
+            style={{ padding: '24px 24px 16px 24px' }}
         >
-            <div style={{ display: 'flex', gap: 16 }}>
-                <div className="avatar">
-                    {user?.name?.charAt(0).toUpperCase() || 'U'}
-                </div>
-                <form onSubmit={handleSubmit} style={{ flex: 1 }}>
+            <form onSubmit={handleSubmit}>
+                <div style={{ position: 'relative' }}>
                     <textarea
+                        className="input-field"
+                        placeholder="Share your progress..."
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
-                        onFocus={() => setIsFocused(true)}
-                        onBlur={() => !content && setIsFocused(false)}
-                        placeholder="Share what you're exploring..."
+                        onFocus={() => setIsExpanded(true)}
                         style={{
-                            width: '100%',
-                            minHeight: isFocused ? 100 : 60,
-                            padding: 16,
-                            background: 'var(--sand)',
-                            border: 'none',
-                            borderRadius: 16,
-                            fontSize: 15,
-                            lineHeight: 1.6,
-                            color: 'var(--ink)',
+                            minHeight: isExpanded ? 120 : 48,
                             resize: 'none',
-                            transition: 'min-height 300ms ease'
+                            border: 'none',
+                            background: isExpanded ? 'var(--bg-app)' : 'transparent',
+                            padding: isExpanded ? '16px' : '0',
+                            transition: 'all 0.3s ease',
+                            fontSize: '1rem',
+                            boxShadow: 'none'
                         }}
                     />
-
-                    {error && (
-                        <p style={{
-                            color: '#C53030',
-                            fontSize: 13,
-                            marginTop: 12,
-                            padding: '8px 12px',
-                            background: 'rgba(197, 48, 48, 0.08)',
-                            borderRadius: 8
-                        }}>
-                            {error}
-                        </p>
+                    {!isExpanded && !content && (
+                        <div style={{
+                            position: 'absolute',
+                            top: 0,
+                            left: 0,
+                            width: '100%',
+                            height: '100%',
+                            cursor: 'text'
+                        }} onClick={() => setIsExpanded(true)} />
                     )}
+                </div>
 
-                    <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{
-                            opacity: isFocused ? 1 : 0,
-                            height: isFocused ? 'auto' : 0
-                        }}
-                        style={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            marginTop: 16,
-                            overflow: 'hidden'
-                        }}
-                    >
-                        <div style={{ display: 'flex', gap: 8 }}>
-                            <button type="button" className="btn-icon" style={{ width: 40, height: 40 }}>
-                                <FiImage size={18} />
-                            </button>
-                        </div>
-
-                        <motion.button
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            type="submit"
-                            disabled={loading || !content.trim()}
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: 8,
-                                padding: '12px 24px',
-                                background: content.trim() ? 'var(--ink)' : 'var(--sand)',
-                                color: content.trim() ? 'var(--ivory)' : 'var(--mist)',
-                                border: 'none',
-                                borderRadius: 100,
-                                fontSize: 14,
-                                fontWeight: 600,
-                                cursor: content.trim() ? 'pointer' : 'not-allowed',
-                                transition: 'all 200ms ease'
-                            }}
+                <AnimatePresence>
+                    {(isExpanded || content) && (
+                        <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            style={{ overflow: 'hidden' }}
                         >
-                            {loading ? 'Posting...' : 'Share'}
-                            <FiSend size={14} />
-                        </motion.button>
-                    </motion.div>
-                </form>
-            </div>
+                            <div style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                marginTop: 16,
+                                paddingTop: 16,
+                                borderTop: '1px solid var(--border-subtle)'
+                            }}>
+                                <div style={{ display: 'flex', gap: 8 }}>
+                                    <button type="button" className="btn-icon" style={{ color: 'var(--text-secondary)', background: 'transparent', border: 'none', padding: 8, borderRadius: 8, cursor: 'pointer' }}>
+                                        <FiImage size={20} />
+                                    </button>
+                                    <button type="button" className="btn-icon" style={{ color: 'var(--text-secondary)', background: 'transparent', border: 'none', padding: 8, borderRadius: 8, cursor: 'pointer' }}>
+                                        <FiSmile size={20} />
+                                    </button>
+                                </div>
+                                <motion.button
+                                    whileHover={{ scale: 1.05 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    className="btn btn-primary"
+                                    style={{ padding: '8px 24px', fontSize: 13 }}
+                                    disabled={loading}
+                                >
+                                    {loading ? 'Posting...' : 'Post'} <FiSend size={14} />
+                                </motion.button>
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+            </form>
         </motion.div>
     );
 };

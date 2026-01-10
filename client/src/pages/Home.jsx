@@ -3,7 +3,32 @@ import { useAuth } from '../context/AuthContext';
 import CreatePost from '../components/CreatePost';
 import PostCard from '../components/PostCard';
 import { motion } from 'framer-motion';
-import { FiFeather, FiTrendingUp } from 'react-icons/fi';
+import { FiActivity, FiUsers, FiTarget, FiArrowRight } from 'react-icons/fi';
+
+const StatCard = ({ label, value, icon: Icon, delay }) => (
+    <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay, duration: 0.5 }}
+        className="card"
+        style={{
+            padding: '24px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            height: 160
+        }}
+    >
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <span className="t-label">{label}</span>
+            <Icon size={20} style={{ color: 'var(--text-tertiary)' }} />
+        </div>
+        <div>
+            <div className="t-headline-2" style={{ marginBottom: 4 }}>{value}</div>
+            <div style={{ fontSize: 13, color: 'var(--text-secondary)' }}>+12% vs last week</div>
+        </div>
+    </motion.div>
+);
 
 const Home = () => {
     const { user, getAuthHeader } = useAuth();
@@ -26,153 +51,110 @@ const Home = () => {
         }
     };
 
-    const handlePostCreated = (newPost) => {
-        setPosts([newPost, ...posts]);
-    };
-
-    const handleSavePost = async (postId) => {
-        try {
-            await fetch(`/api/vault/save/${postId}`, {
-                method: 'POST',
-                headers: getAuthHeader()
-            });
-        } catch (error) {
-            console.error('Failed to save post:', error);
-        }
-    };
-
     return (
-        <div className="animate-fadeIn">
-            {/* Hero Section */}
-            <motion.header
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-                style={{ marginBottom: 48 }}
-            >
-                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-                    <div>
-                        <span className="text-overline" style={{ marginBottom: 8, display: 'block' }}>
-                            Welcome back
-                        </span>
-                        <h1 style={{
-                            fontFamily: 'Playfair Display, serif',
-                            fontSize: 'clamp(2rem, 4vw, 3rem)',
-                            fontWeight: 500,
-                            marginBottom: 8
-                        }}>
-                            {user?.name?.split(' ')[0] || 'Explorer'}
-                        </h1>
-                        <p style={{ color: 'var(--mist)', fontSize: 15 }}>
-                            What will you learn today?
-                        </p>
+        <div className="layout-content">
+            {/* Header / Command Center */}
+            <header style={{ marginBottom: 64, marginTop: 32 }}>
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.8 }}
+                >
+                    <h1 className="t-headline-1" style={{ marginBottom: 16 }}>
+                        Command Center
+                    </h1>
+                    <div style={{ display: 'flex', gap: 32, alignItems: 'center' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                            <div className="avatar-ring" style={{ width: 32, height: 32 }}>
+                                <div className="avatar" style={{ background: 'var(--color-void)' }} />
+                            </div>
+                            <span className="t-subhead" style={{ color: 'var(--text-primary)' }}>
+                                {user?.name}
+                            </span>
+                        </div>
+                        <div className="badge badge-gold">
+                            Level {Math.floor(user?.xp / 100) || 1} Architect
+                        </div>
                     </div>
+                </motion.div>
+            </header>
 
-                    <div className="xp-badge">
-                        {user?.xp || 0} XP
+            {/* Dashboard Grid */}
+            <div className="grid-12" style={{ marginBottom: 64 }}>
+                <div style={{ gridColumn: 'span 4' }}>
+                    <StatCard label="Total XP" value={user?.xp || 0} icon={FiActivity} delay={0.1} />
+                </div>
+                <div style={{ gridColumn: 'span 4' }}>
+                    <StatCard label="Network" value="28" icon={FiUsers} delay={0.2} />
+                </div>
+                <div style={{ gridColumn: 'span 4' }}>
+                    <StatCard label="Goals Met" value="8/10" icon={FiTarget} delay={0.3} />
+                </div>
+            </div>
+
+            {/* Main Content Area */}
+            <div className="grid-12">
+                {/* Feed Section */}
+                <div style={{ gridColumn: 'span 8' }}>
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.4 }}
+                        style={{ marginBottom: 32, display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}
+                    >
+                        <h2 className="t-headline-2" style={{ fontSize: '1.5rem' }}>Stream</h2>
+                        <button className="btn-ghost" style={{ padding: '8px 16px', fontSize: 13 }}>Filter View</button>
+                    </motion.div>
+
+                    <CreatePost onPostCreated={(p) => setPosts([p, ...posts])} />
+
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 24, marginTop: 40 }}>
+                        {posts.map((post, i) => (
+                            <motion.div
+                                key={post.id}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.5 + i * 0.1 }}
+                            >
+                                <PostCard post={post} />
+                            </motion.div>
+                        ))}
                     </div>
                 </div>
-            </motion.header>
 
-            {/* Stats Row */}
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1, duration: 0.5 }}
-                style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(3, 1fr)',
-                    gap: 16,
-                    marginBottom: 40
-                }}
-            >
-                {[
-                    { label: 'Daily Streak', value: '7', suffix: 'days', icon: '🔥' },
-                    { label: 'This Week', value: '+120', suffix: 'XP', icon: '📈' },
-                    { label: 'Network', value: '24', suffix: 'connections', icon: '🤝' }
-                ].map((stat, i) => (
+                {/* Sidebar / Context */}
+                <aside style={{ gridColumn: 'span 4', paddingLeft: 24 }}>
                     <motion.div
-                        key={stat.label}
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: 0.15 + i * 0.05 }}
-                        className="card"
-                        style={{
-                            background: 'var(--ivory)',
-                            padding: 20,
-                            textAlign: 'center'
-                        }}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.6 }}
+                        style={{ position: 'sticky', top: 40 }}
                     >
-                        <span style={{ fontSize: 24, marginBottom: 8, display: 'block' }}>{stat.icon}</span>
-                        <div style={{
-                            fontFamily: 'Playfair Display, serif',
-                            fontSize: 28,
-                            fontWeight: 500,
-                            color: 'var(--ink)'
-                        }}>
-                            {stat.value}
+                        <div style={{ marginBottom: 40 }}>
+                            <h3 className="t-label" style={{ marginBottom: 24 }}>SUGGESTED SPACES</h3>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                                {[1, 2, 3].map(i => (
+                                    <div key={i} className="card" style={{ padding: 16, display: 'flex', alignItems: 'center', gap: 12 }}>
+                                        <div style={{ width: 40, height: 40, background: 'var(--color-marble)', borderRadius: 8 }} />
+                                        <div>
+                                            <div style={{ fontWeight: 600, fontSize: 14 }}>System Design</div>
+                                            <div style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>1.2k Architects</div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
-                        <div style={{ fontSize: 11, color: 'var(--mist)', textTransform: 'uppercase', letterSpacing: 1 }}>
-                            {stat.suffix}
+
+                        <div className="card" style={{ background: 'var(--color-void)', color: '#FFF' }}>
+                            <h3 className="t-headline-2" style={{ color: '#FFF', fontSize: '1.5rem', marginBottom: 12 }}>Pro Tip</h3>
+                            <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: 14, marginBottom: 24 }}>
+                                Connect your GitHub to verify your builder status and unlock the Architect badge.
+                            </p>
+                            <button className="btn" style={{ background: '#FFF', color: '#000', width: '100%' }}>Connect</button>
                         </div>
                     </motion.div>
-                ))}
-            </motion.div>
-
-            {/* Section Title */}
-            <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.2 }}
-                style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 12,
-                    marginBottom: 24
-                }}
-            >
-                <FiTrendingUp style={{ color: 'var(--gold)' }} />
-                <span className="text-overline">Latest from your network</span>
-                <div style={{ flex: 1, height: 1, background: 'var(--sand)' }} />
-            </motion.div>
-
-            {/* Create Post */}
-            <CreatePost onPostCreated={handlePostCreated} />
-
-            {/* Feed */}
-            {loading ? (
-                <div style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    padding: 80
-                }}>
-                    <div className="spinner" />
-                </div>
-            ) : posts.length === 0 ? (
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="empty-state"
-                >
-                    <div className="empty-state-icon">
-                        <FiFeather size={32} />
-                    </div>
-                    <h3 className="empty-state-title">Start the conversation</h3>
-                    <p className="empty-state-text">
-                        Share what you're learning or building. Your network is waiting.
-                    </p>
-                </motion.div>
-            ) : (
-                <div className="stagger-children">
-                    {posts.map(post => (
-                        <PostCard
-                            key={post.id}
-                            post={post}
-                            onSave={handleSavePost}
-                        />
-                    ))}
-                </div>
-            )}
+                </aside>
+            </div>
         </div>
     );
 };

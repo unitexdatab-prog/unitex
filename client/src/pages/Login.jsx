@@ -1,31 +1,29 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Login = () => {
     const navigate = useNavigate();
     const { login, isAuthenticated } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [focusedField, setFocusedField] = useState(null);
 
-    if (isAuthenticated) {
-        navigate('/');
-        return null;
-    }
+    // Redirect if already authenticated
+    useEffect(() => {
+        if (isAuthenticated) navigate('/');
+    }, [isAuthenticated, navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError('');
         setLoading(true);
-
         try {
             await login(email, password);
             navigate('/');
         } catch (err) {
-            setError(err.message);
+            console.error(err);
         } finally {
             setLoading(false);
         }
@@ -33,312 +31,234 @@ const Login = () => {
 
     return (
         <div style={{
-            minHeight: '100vh',
+            position: 'relative',
+            height: '100vh',
+            width: '100vw',
+            overflow: 'hidden',
             display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            background: 'var(--cream)'
+            gridTemplateColumns: 'minmax(400px, 40%) 1fr',
+            background: 'var(--color-alabaster)'
         }}>
-            {/* Left Side - Brand */}
+            {/* 
+               LEFT PANEL: The "Architectural" Statement 
+               Features high-end typography and brand presence.
+            */}
             <motion.div
-                initial={{ opacity: 0, x: -40 }}
-                animate={{ opacity: 1, x: 0 }}
+                initial={{ x: '-100%' }}
+                animate={{ x: 0 }}
                 transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
                 style={{
-                    background: 'var(--ink)',
+                    background: 'var(--color-void)',
+                    color: 'var(--color-alabaster)',
+                    position: 'relative',
+                    padding: '80px',
                     display: 'flex',
                     flexDirection: 'column',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    padding: '60px',
-                    position: 'relative',
-                    overflow: 'hidden'
+                    justifyContent: 'space-between',
+                    zIndex: 2
                 }}
             >
-                {/* Abstract Pattern */}
-                <div style={{
-                    position: 'absolute',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    opacity: 0.03,
-                    background: `
-                        radial-gradient(circle at 20% 80%, var(--gold) 0%, transparent 40%),
-                        radial-gradient(circle at 80% 20%, var(--bronze) 0%, transparent 40%)
-                    `
-                }} />
-
-                {/* Grid lines */}
-                <div style={{
-                    position: 'absolute',
-                    inset: 40,
-                    border: '1px solid rgba(166, 139, 91, 0.1)',
-                    borderRadius: 32
-                }} />
-
+                {/* Brand Header */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3, duration: 0.6 }}
-                    style={{ textAlign: 'center', position: 'relative', zIndex: 1 }}
-                >
-                    {/* Logo Mark */}
-                    <div style={{
-                        width: 72,
-                        height: 72,
-                        background: 'linear-gradient(135deg, var(--gold) 0%, var(--bronze) 100%)',
-                        borderRadius: 20,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        margin: '0 auto 40px',
-                        boxShadow: '0 8px 32px rgba(166, 139, 91, 0.3)'
-                    }}>
-                        <span style={{
-                            color: 'var(--ivory)',
-                            fontFamily: 'var(--font-display)',
-                            fontSize: 36,
-                            fontWeight: 600
-                        }}>U</span>
-                    </div>
-
-                    <h1 style={{
-                        fontFamily: 'Playfair Display, serif',
-                        fontSize: 'clamp(2rem, 4vw, 3.5rem)',
-                        fontWeight: 500,
-                        color: 'var(--ivory)',
-                        marginBottom: 16,
-                        lineHeight: 1.1
-                    }}>
-                        UniteX
-                    </h1>
-
-                    <p style={{
-                        color: 'var(--mist)',
-                        fontSize: 16,
-                        maxWidth: 280,
-                        lineHeight: 1.7
-                    }}>
-                        Where ambitious minds connect, learn, and build together.
-                    </p>
-
-                    {/* Decorative element */}
-                    <div style={{
-                        marginTop: 48,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: 16
-                    }}>
-                        <div style={{ width: 24, height: 1, background: 'var(--bronze)' }} />
-                        <span style={{ color: 'var(--gold)', fontSize: 12, letterSpacing: 3 }}>✦</span>
-                        <div style={{ width: 24, height: 1, background: 'var(--bronze)' }} />
-                    </div>
-                </motion.div>
-            </motion.div>
-
-            {/* Right Side - Form */}
-            <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.6 }}
-                style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    padding: 60
-                }}
-            >
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2, duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+                    transition={{ delay: 0.5, duration: 0.6 }}
                     style={{
-                        width: '100%',
-                        maxWidth: 420
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 16
                     }}
                 >
+                    <div style={{
+                        width: 40,
+                        height: 40,
+                        background: 'linear-gradient(135deg, var(--color-gold-buff), var(--color-bronze))',
+                        borderRadius: 12,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontFamily: 'var(--font-serif)',
+                        fontWeight: 700,
+                        fontSize: 20,
+                        boxShadow: '0 8px 16px rgba(166, 139, 91, 0.3)'
+                    }}>U</div>
                     <span style={{
-                        display: 'block',
-                        fontSize: 11,
+                        fontFamily: 'var(--font-sans)',
                         fontWeight: 600,
+                        letterSpacing: '0.05em'
+                    }}>UNITEX</span>
+                </motion.div>
+
+                {/* Central Statement */}
+                <div style={{ position: 'relative' }}>
+                    <motion.h1
+                        initial={{ opacity: 0, y: 40 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.7, duration: 0.8, ease: "easeOut" }}
+                        className="t-headline-1"
+                        style={{ color: '#FFF', marginBottom: 24, maxWidth: '80%' }}
+                    >
+                        Design your <br />
+                        <span style={{ color: 'var(--color-gold-buff)', fontStyle: 'italic' }}>legacy</span>.
+                    </motion.h1>
+                    <motion.p
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 0.7 }}
+                        transition={{ delay: 0.9, duration: 0.8 }}
+                        className="t-subhead"
+                        style={{ color: 'rgba(255,255,255,0.6)', maxWidth: 300, lineHeight: 1.6 }}
+                    >
+                        Join the elite network of builders, thinkers, and creators shaping the future.
+                    </motion.p>
+                </div>
+
+                {/* Footer Metadata */}
+                <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 1.1 }}
+                    style={{
+                        display: 'flex',
+                        gap: 32,
+                        fontSize: 12,
+                        color: 'rgba(255,255,255,0.3)',
                         textTransform: 'uppercase',
-                        letterSpacing: 2,
-                        color: 'var(--bronze)',
-                        marginBottom: 12
-                    }}>
-                        Welcome back
-                    </span>
+                        letterSpacing: '0.1em'
+                    }}
+                >
+                    <span>© 2024 Unitex</span>
+                    <span>V 3.0.0</span>
+                </motion.div>
 
-                    <h2 style={{
-                        fontFamily: 'Playfair Display, serif',
-                        fontSize: 'clamp(1.75rem, 3vw, 2.5rem)',
-                        fontWeight: 500,
-                        marginBottom: 8,
-                        lineHeight: 1.2
-                    }}>
-                        Sign in to your account
-                    </h2>
+                {/* Abstract Visual Elements */}
+                <div style={{
+                    position: 'absolute',
+                    bottom: '-20%',
+                    right: '-20%',
+                    width: '600px',
+                    height: '600px',
+                    background: 'radial-gradient(circle, rgba(166, 139, 91, 0.15) 0%, transparent 60%)',
+                    borderRadius: '50%',
+                    pointerEvents: 'none',
+                    filter: 'blur(40px)'
+                }} />
+            </motion.div>
 
-                    <p style={{
-                        color: 'var(--mist)',
-                        marginBottom: 40
-                    }}>
-                        Continue your learning journey
-                    </p>
+            {/* 
+               RIGHT PANEL: The "Functional" Precision
+               Features the interactive form with micro-interactions.
+            */}
+            <div style={{
+                position: 'relative',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                background: 'var(--color-marble)'
+            }}>
+                {/* Dynamic Background Mesh */}
+                <div style={{
+                    position: 'absolute',
+                    inset: 0,
+                    backgroundImage: 'radial-gradient(rgba(0,0,0,0.03) 1px, transparent 1px)',
+                    backgroundSize: '32px 32px',
+                    opacity: 0.5
+                }} />
 
-                    <form onSubmit={handleSubmit}>
-                        <div style={{ marginBottom: 24 }}>
-                            <label style={{
-                                display: 'block',
-                                fontSize: 11,
-                                fontWeight: 600,
-                                textTransform: 'uppercase',
-                                letterSpacing: 1.5,
-                                color: 'var(--bronze)',
-                                marginBottom: 10
-                            }}>
-                                Email Address
-                            </label>
-                            <input
-                                type="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                placeholder="you@example.com"
-                                required
-                                style={{
-                                    width: '100%',
-                                    padding: '18px 20px',
-                                    background: 'var(--ivory)',
-                                    border: '2px solid transparent',
-                                    borderRadius: 16,
-                                    fontSize: 16,
-                                    color: 'var(--ink)',
-                                    transition: 'all 200ms ease'
-                                }}
-                                onFocus={(e) => {
-                                    e.target.style.borderColor = 'var(--gold)';
-                                    e.target.style.boxShadow = '0 0 0 4px rgba(166, 139, 91, 0.1)';
-                                }}
-                                onBlur={(e) => {
-                                    e.target.style.borderColor = 'transparent';
-                                    e.target.style.boxShadow = 'none';
-                                }}
-                            />
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.4, duration: 0.6 }}
+                    style={{
+                        width: '100%',
+                        maxWidth: 480,
+                        padding: 48,
+                        zIndex: 10
+                    }}
+                >
+                    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+                        <div style={{ marginBottom: 16 }}>
+                            <h2 className="t-headline-2" style={{ marginBottom: 8 }}>Welcome back</h2>
+                            <p className="t-subhead">Please enter your details.</p>
                         </div>
 
-                        <div style={{ marginBottom: 32 }}>
-                            <label style={{
-                                display: 'block',
-                                fontSize: 11,
-                                fontWeight: 600,
-                                textTransform: 'uppercase',
-                                letterSpacing: 1.5,
-                                color: 'var(--bronze)',
-                                marginBottom: 10
-                            }}>
-                                Password
-                            </label>
-                            <input
-                                type="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                placeholder="••••••••"
-                                required
-                                style={{
-                                    width: '100%',
-                                    padding: '18px 20px',
-                                    background: 'var(--ivory)',
-                                    border: '2px solid transparent',
-                                    borderRadius: 16,
-                                    fontSize: 16,
-                                    color: 'var(--ink)',
-                                    transition: 'all 200ms ease'
+                        {/* Email Input */}
+                        <div style={{ position: 'relative' }}>
+                            <label className="input-label" htmlFor="email">EMAIL</label>
+                            <motion.div
+                                animate={{
+                                    boxShadow: focusedField === 'email'
+                                        ? '0 0 0 4px rgba(166, 139, 91, 0.15)'
+                                        : '0 0 0 0px transparent'
                                 }}
-                                onFocus={(e) => {
-                                    e.target.style.borderColor = 'var(--gold)';
-                                    e.target.style.boxShadow = '0 0 0 4px rgba(166, 139, 91, 0.1)';
-                                }}
-                                onBlur={(e) => {
-                                    e.target.style.borderColor = 'transparent';
-                                    e.target.style.boxShadow = 'none';
-                                }}
-                            />
-                        </div>
-
-                        {error && (
-                            <motion.p
-                                initial={{ opacity: 0, y: -10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                style={{
-                                    color: '#C53030',
-                                    fontSize: 14,
-                                    marginBottom: 24,
-                                    padding: '12px 16px',
-                                    background: 'rgba(197, 48, 48, 0.08)',
-                                    borderRadius: 12,
-                                    border: '1px solid rgba(197, 48, 48, 0.2)'
-                                }}
+                                style={{ borderRadius: 14 }}
                             >
-                                {error}
-                            </motion.p>
-                        )}
+                                <input
+                                    id="email"
+                                    type="email"
+                                    className="input-field"
+                                    placeholder="name@domain.com"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    onFocus={() => setFocusedField('email')}
+                                    onBlur={() => setFocusedField(null)}
+                                />
+                            </motion.div>
+                        </div>
+
+                        {/* Password Input */}
+                        <div style={{ position: 'relative' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                                <label className="input-label" htmlFor="password">PASSWORD</label>
+                                <a href="#" style={{ fontSize: 12, color: 'var(--text-tertiary)', textDecoration: 'none' }}>Forgot?</a>
+                            </div>
+                            <motion.div
+                                animate={{
+                                    boxShadow: focusedField === 'password'
+                                        ? '0 0 0 4px rgba(166, 139, 91, 0.15)'
+                                        : '0 0 0 0px transparent'
+                                }}
+                                style={{ borderRadius: 14 }}
+                            >
+                                <input
+                                    id="password"
+                                    type="password"
+                                    className="input-field"
+                                    placeholder="••••••••"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    onFocus={() => setFocusedField('password')}
+                                    onBlur={() => setFocusedField(null)}
+                                />
+                            </motion.div>
+                        </div>
 
                         <motion.button
-                            whileHover={{ scale: 1.02, y: -2 }}
+                            whileHover={{ scale: 1.02, translateY: -2 }}
                             whileTap={{ scale: 0.98 }}
-                            type="submit"
+                            className="btn btn-primary"
+                            style={{ width: '100%', marginTop: 16 }}
                             disabled={loading}
-                            style={{
-                                width: '100%',
-                                padding: '18px 32px',
-                                background: 'var(--ink)',
-                                color: 'var(--ivory)',
-                                border: 'none',
-                                borderRadius: 100,
-                                fontSize: 15,
-                                fontWeight: 600,
-                                letterSpacing: 0.5,
-                                cursor: 'pointer',
-                                boxShadow: '0 4px 20px rgba(26, 24, 21, 0.2)',
-                                transition: 'all 200ms ease',
-                                opacity: loading ? 0.7 : 1,
-                                position: 'relative',
-                                overflow: 'hidden'
-                            }}
                         >
-                            <span style={{ position: 'relative', zIndex: 1 }}>
-                                {loading ? 'Signing in...' : 'Sign In'}
-                            </span>
+                            {loading ? 'Authenticating...' : 'Sign In'}
                         </motion.button>
-                    </form>
 
-                    <div style={{
-                        marginTop: 32,
-                        paddingTop: 32,
-                        borderTop: '1px solid var(--sand)',
-                        textAlign: 'center'
-                    }}>
-                        <p style={{ color: 'var(--mist)', fontSize: 14 }}>
-                            New to UniteX?{' '}
+                        <div style={{ textAlign: 'center', marginTop: 16 }}>
+                            <span style={{ color: 'var(--text-tertiary)', fontSize: 14 }}>Don't have an account? </span>
                             <Link
                                 to="/signup"
                                 style={{
-                                    color: 'var(--gold)',
+                                    color: 'var(--text-primary)',
                                     fontWeight: 600,
                                     textDecoration: 'none',
-                                    borderBottom: '1px solid transparent',
-                                    transition: 'border-color 200ms'
+                                    borderBottom: '1px solid currentColor'
                                 }}
-                                onMouseOver={(e) => e.target.style.borderBottomColor = 'var(--gold)'}
-                                onMouseOut={(e) => e.target.style.borderBottomColor = 'transparent'}
                             >
-                                Create an account
+                                Join now
                             </Link>
-                        </p>
-                    </div>
+                        </div>
+                    </form>
                 </motion.div>
-            </motion.div>
+            </div>
         </div>
     );
 };

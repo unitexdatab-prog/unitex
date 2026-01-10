@@ -9,39 +9,55 @@ const Layout = () => {
     if (loading) {
         return (
             <div style={{
-                minHeight: '100vh',
+                height: '100vh',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                background: 'var(--cream)'
+                background: 'var(--bg-app)'
             }}>
                 <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.4 }}
                     style={{
                         display: 'flex',
                         flexDirection: 'column',
                         alignItems: 'center',
-                        gap: 24
+                        gap: 32
                     }}
                 >
                     <div style={{
-                        width: 56,
-                        height: 56,
-                        background: 'linear-gradient(135deg, var(--gold) 0%, var(--bronze) 100%)',
-                        borderRadius: 16,
+                        width: 64,
+                        height: 64,
+                        background: 'var(--color-void)',
+                        color: 'var(--color-gold-buff)',
+                        borderRadius: 20,
                         display: 'flex',
                         alignItems: 'center',
-                        justifyContent: 'center'
+                        justifyContent: 'center',
+                        fontFamily: 'var(--font-serif)',
+                        fontSize: 28,
+                        fontWeight: 700,
+                        boxShadow: '0 12px 32px rgba(0,0,0,0.1)'
+                    }}>U</div>
+
+                    <div style={{
+                        width: 40,
+                        height: 2,
+                        background: 'var(--border-prominent)',
+                        overflow: 'hidden',
+                        borderRadius: 99
                     }}>
-                        <span style={{
-                            color: 'var(--ivory)',
-                            fontFamily: 'Playfair Display, serif',
-                            fontSize: 28,
-                            fontWeight: 600
-                        }}>U</span>
+                        <motion.div
+                            animate={{ x: [-40, 40] }}
+                            transition={{ repeat: Infinity, duration: 1, ease: 'easeInOut' }}
+                            style={{
+                                width: 20,
+                                height: '100%',
+                                background: 'var(--color-gold-buff)'
+                            }}
+                        />
                     </div>
-                    <div className="spinner" />
                 </motion.div>
             </div>
         );
@@ -52,17 +68,19 @@ const Layout = () => {
     }
 
     return (
-        <div className="app-layout">
+        <div className="app-shell">
             <Navbar />
             <motion.main
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ duration: 0.4 }}
-                className="main-content"
+                transition={{ duration: 0.6 }}
+                style={{
+                    marginLeft: 'var(--sidebar-width)',
+                    minHeight: '100vh',
+                    position: 'relative'
+                }}
             >
-                <div className="content-container">
-                    <Outlet />
-                </div>
+                <Outlet />
             </motion.main>
         </div>
     );

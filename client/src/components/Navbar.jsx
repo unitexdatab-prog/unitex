@@ -28,88 +28,134 @@ const Navbar = () => {
     };
 
     return (
-        <nav className="nav-dock">
-            {/* Logo */}
+        <motion.nav
+            initial={{ x: -100 }}
+            animate={{ x: 0 }}
+            transition={{ duration: 0.8, ease: "circOut" }}
+            style={{
+                position: 'fixed',
+                left: 0,
+                top: 0,
+                bottom: 0,
+                width: 'var(--sidebar-width)',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                padding: '32px 0',
+                zIndex: 100,
+                background: 'rgba(255,255,255,0.8)',
+                backdropFilter: 'blur(12px)',
+                borderRight: '1px solid var(--border-subtle)'
+            }}
+        >
+            {/* Architectural Monogram */}
             <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-                className="nav-logo"
+                whileHover={{ scale: 1.05 }}
+                style={{
+                    width: 44,
+                    height: 44,
+                    background: 'var(--color-void)',
+                    color: 'var(--color-gold-buff)',
+                    borderRadius: 12,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontFamily: 'var(--font-serif)',
+                    fontSize: 20,
+                    fontWeight: 700,
+                    marginBottom: 48,
+                    cursor: 'pointer',
+                    boxShadow: '0 8px 24px -6px rgba(0,0,0,0.2)'
+                }}
             >
                 U
             </motion.div>
 
-            {/* Nav Items */}
-            <div style={{
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 4,
-                width: '100%',
-                padding: '0 14px'
-            }}>
-                {navItems.map((item, index) => (
-                    <motion.div
+            {/* Navigation Items */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: '100%', alignItems: 'center' }}>
+                {navItems.map((item) => (
+                    <NavLink
                         key={item.path}
-                        initial={{ opacity: 0, x: -10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.1 + index * 0.05, duration: 0.3 }}
+                        to={item.path}
+                        title={item.label}
+                        className={({ isActive }) => `nav-link ${isActive ? 'active' : ''}`}
+                        style={({ isActive }) => ({
+                            width: 44,
+                            height: 44,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            borderRadius: '12px',
+                            color: isActive ? 'var(--color-void)' : 'var(--text-tertiary)',
+                            background: isActive ? 'var(--color-marble)' : 'transparent',
+                            transition: 'all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1)',
+                            position: 'relative'
+                        })}
                     >
-                        <NavLink
-                            to={item.path}
-                            className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
-                            title={item.label}
-                        >
-                            <item.icon size={20} />
-                        </NavLink>
-                    </motion.div>
+                        {({ isActive }) => (
+                            <>
+                                <item.icon size={20} style={{ strokeWidth: isActive ? 2.5 : 2 }} />
+                                {isActive && (
+                                    <motion.div
+                                        layoutId="active-pill"
+                                        style={{
+                                            position: 'absolute',
+                                            left: -12,
+                                            width: 3,
+                                            height: 20,
+                                            background: 'var(--accent)',
+                                            borderRadius: '0 4px 4px 0'
+                                        }}
+                                    />
+                                )}
+                            </>
+                        )}
+                    </NavLink>
                 ))}
             </div>
 
-            {/* Divider */}
-            <div style={{
-                width: 32,
-                height: 1,
-                background: 'var(--sand)',
-                margin: '16px 0'
-            }} />
+            <div style={{ flex: 1 }} />
 
-            {/* Profile & Logout */}
-            <div style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 8,
-                alignItems: 'center'
-            }}>
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                    <NavLink
-                        to={`/profile/${user?.id}`}
-                        className="avatar avatar-sm"
-                        title="Profile"
-                        style={{ textDecoration: 'none' }}
-                    >
-                        {user?.name?.charAt(0).toUpperCase() || 'U'}
-                    </NavLink>
-                </motion.div>
+            {/* User Profile */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 24, alignItems: 'center' }}>
+                <NavLink to={`/profile/${user?.id}`} style={{ position: 'relative' }}>
+                    <div className="avatar-ring" style={{ width: 44, height: 44 }}>
+                        {user?.avatar_url ? (
+                            <img src={user.avatar_url} alt={user.name} className="avatar" />
+                        ) : (
+                            <div className="avatar" style={{
+                                background: 'var(--color-obsidian)',
+                                color: '#FFF',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                            }}>
+                                {user?.name?.charAt(0).toUpperCase()}
+                            </div>
+                        )}
+                    </div>
+                </NavLink>
 
-                <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
+                <button
                     onClick={handleLogout}
-                    className="btn-icon"
                     style={{
-                        width: 36,
-                        height: 36,
-                        borderRadius: 10,
+                        width: 44,
+                        height: 44,
+                        border: 'none',
                         background: 'transparent',
-                        color: 'var(--mist)'
+                        color: 'var(--text-tertiary)',
+                        cursor: 'pointer',
+                        transition: 'color 0.2s',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
                     }}
-                    title="Sign out"
+                    title="Logout"
                 >
-                    <FiLogOut size={16} />
-                </motion.button>
+                    <FiLogOut size={20} />
+                </button>
             </div>
-        </nav>
+        </motion.nav>
     );
 };
 
