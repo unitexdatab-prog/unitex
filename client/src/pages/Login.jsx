@@ -125,7 +125,7 @@ const Login = () => {
 
                 <p style={{ textAlign: 'center', marginTop: 24, fontSize: 14 }}>
                     Don't have an account?{' '}
-                    <Link to="/signup" style={{ color: 'var(--color-orange)', fontWeight: 600 }}>
+                    <Link to="/signup" style={{ color: 'var(--color-gold)', fontWeight: 600 }}>
                         Sign up
                     </Link>
                 </p>

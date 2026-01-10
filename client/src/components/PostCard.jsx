@@ -67,7 +67,7 @@ const PostCard = ({ post, onSave }) => {
                             href={post.artifact_url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            style={{ color: 'var(--color-orange)' }}
+                            style={{ color: 'var(--color-gold)' }}
                         >
                             View Attachment →
                         </a>

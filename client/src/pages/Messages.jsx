@@ -158,7 +158,7 @@ const Messages = () => {
                                         }}
                                     >
                                         <div style={{
-                                            background: msg.sender_id === user.id ? 'var(--color-orange)' : 'var(--color-white)',
+                                            background: msg.sender_id === user.id ? 'var(--color-gold)' : 'var(--color-white)',
                                             color: msg.sender_id === user.id ? 'white' : 'inherit',
                                             padding: '10px 16px',
                                             borderRadius: 16,

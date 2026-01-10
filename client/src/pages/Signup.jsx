@@ -129,7 +129,7 @@ const Signup = () => {
                                 justifyContent: 'center',
                                 fontSize: 14,
                                 fontWeight: 600,
-                                background: step >= s.num ? 'var(--color-orange)' : 'var(--color-silver)',
+                                background: step >= s.num ? 'var(--color-gold)' : 'var(--color-silver)',
                                 color: step >= s.num ? 'white' : 'var(--color-muted)'
                             }}>
                                 {step > s.num ? <FiCheck size={16} /> : s.num}
@@ -138,7 +138,7 @@ const Signup = () => {
                                 <div style={{
                                     width: 40,
                                     height: 2,
-                                    background: step > s.num ? 'var(--color-orange)' : 'var(--color-silver)'
+                                    background: step > s.num ? 'var(--color-gold)' : 'var(--color-silver)'
                                 }} />
                             )}
                         </div>
@@ -328,7 +328,7 @@ const Signup = () => {
 
                 <p style={{ textAlign: 'center', marginTop: 24, fontSize: 14 }}>
                     Already have an account?{' '}
-                    <Link to="/login" style={{ color: 'var(--color-orange)', fontWeight: 600 }}>
+                    <Link to="/login" style={{ color: 'var(--color-gold)', fontWeight: 600 }}>
                         Sign in
                     </Link>
                 </p>

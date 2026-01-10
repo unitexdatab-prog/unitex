@@ -70,8 +70,8 @@ const Navbar = () => {
                             width: 48,
                             height: 48,
                             borderRadius: 12,
-                            color: isActive ? 'var(--color-orange)' : 'var(--color-muted)',
-                            backgroundColor: isActive ? 'rgba(244, 81, 28, 0.1)' : 'transparent',
+                            color: isActive ? 'var(--color-gold)' : 'var(--color-muted)',
+                            backgroundColor: isActive ? 'rgba(166, 139, 91, 0.1)' : 'transparent',
                             transition: 'all 150ms ease'
                         })}
                         title={item.label}

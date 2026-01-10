@@ -1,22 +1,22 @@
 /* UniteX Design System */
-/* Swiss Minimalism with Orange Accent */
+/* Earth Tone Palette - Elegant & Premium */
 
 :root {
-    /* Colors */
-    --color-light-gray: #F4F5F5;
-    --color-silver: #EBEDEE;
-    --color-medium-gray: #CBCED2;
-    --color-dark: #31303A;
-    --color-orange: #F4511C;
-    --color-coral: #FF7F50;
-    --color-teal: #008080;
-    --color-muted: #A8A8A8;
+    /* Colors - Earth Tone Palette */
+    --color-light-gray: #FAF9F7;
+    --color-silver: #EDE8E0;
+    --color-medium-gray: #C9BBA8;
+    --color-dark: #1E1E1E;
+    --color-gold: #A68B5B;
+    --color-tan: #9E8B6E;
+    --color-beige: #D4C4B0;
+    --color-muted: #8B7D6B;
     --color-white: #FFFFFF;
-    --color-black: #000000;
+    --color-black: #1E1E1E;
 
     /* Gradient */
-    --gradient-primary: linear-gradient(135deg, #F4511C 0%, #FF7F50 100%);
-    --gradient-dark: linear-gradient(135deg, #31303A 0%, #4A4957 100%);
+    --gradient-primary: linear-gradient(135deg, #A68B5B 0%, #9E8B6E 100%);
+    --gradient-dark: linear-gradient(135deg, #1E1E1E 0%, #2D2D2D 100%);
 
     /* Typography */
     --font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
@@ -243,8 +243,8 @@ h4,
 
 .input:focus {
     outline: none;
-    border-color: var(--color-orange);
-    box-shadow: 0 0 0 3px rgba(244, 81, 28, 0.1);
+    border-color: var(--color-gold);
+    box-shadow: 0 0 0 3px rgba(166, 139, 91, 0.1);
 }
 
 .input::placeholder {
@@ -309,8 +309,8 @@ h4,
 }
 
 .tag-primary {
-    background: rgba(244, 81, 28, 0.1);
-    color: var(--color-orange);
+    background: rgba(166, 139, 91, 0.1);
+    color: var(--color-gold);
 }
 
 /* XP Badge */
@@ -343,7 +343,7 @@ h4,
     width: 24px;
     height: 24px;
     border: 2px solid var(--color-silver);
-    border-top-color: var(--color-orange);
+    border-top-color: var(--color-gold);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
 }
@@ -570,6 +570,6 @@ h4,
 
 /* Focus Visible */
 :focus-visible {
-    outline: 2px solid var(--color-orange);
+    outline: 2px solid var(--color-gold);
     outline-offset: 2px;
 }

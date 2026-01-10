@@ -6,7 +6,7 @@ const roadmaps = [
         id: 1,
         title: 'Frontend Development',
         description: 'Master modern frontend technologies',
-        color: '#F4511C',
+        color: '#A68B5B',
         steps: [
             { title: 'HTML & CSS Basics', completed: true },
             { title: 'JavaScript Fundamentals', completed: true },
