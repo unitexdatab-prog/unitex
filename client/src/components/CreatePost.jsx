@@ -1,13 +1,14 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
-import { FiSend } from 'react-icons/fi';
+import { FiSend, FiImage } from 'react-icons/fi';
 
 const CreatePost = ({ onPostCreated, spaceId = null }) => {
     const { user, getAuthHeader } = useAuth();
     const [content, setContent] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [isFocused, setIsFocused] = useState(false);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -33,6 +34,7 @@ const CreatePost = ({ onPostCreated, spaceId = null }) => {
             }
 
             setContent('');
+            setIsFocused(false);
             if (onPostCreated) {
                 onPostCreated(data);
             }
@@ -44,8 +46,19 @@ const CreatePost = ({ onPostCreated, spaceId = null }) => {
     };
 
     return (
-        <div className="card" style={{ marginBottom: 24 }}>
-            <div style={{ display: 'flex', gap: 12 }}>
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.25, duration: 0.5 }}
+            className="card"
+            style={{
+                marginBottom: 32,
+                background: 'var(--ivory)',
+                border: isFocused ? '2px solid var(--gold)' : '2px solid transparent',
+                transition: 'border-color 200ms ease'
+            }}
+        >
+            <div style={{ display: 'flex', gap: 16 }}>
                 <div className="avatar">
                     {user?.name?.charAt(0).toUpperCase() || 'U'}
                 </div>
@@ -53,38 +66,84 @@ const CreatePost = ({ onPostCreated, spaceId = null }) => {
                     <textarea
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
-                        placeholder="What are you learning or building today?"
-                        className="input textarea"
+                        onFocus={() => setIsFocused(true)}
+                        onBlur={() => !content && setIsFocused(false)}
+                        placeholder="Share what you're exploring..."
                         style={{
-                            minHeight: 80,
-                            resize: 'none',
+                            width: '100%',
+                            minHeight: isFocused ? 100 : 60,
+                            padding: 16,
+                            background: 'var(--sand)',
                             border: 'none',
-                            background: 'var(--color-silver)',
-                            marginBottom: 12
+                            borderRadius: 16,
+                            fontSize: 15,
+                            lineHeight: 1.6,
+                            color: 'var(--ink)',
+                            resize: 'none',
+                            transition: 'min-height 300ms ease'
                         }}
                     />
+
                     {error && (
-                        <p style={{ color: '#e53e3e', fontSize: 13, marginBottom: 12 }}>{error}</p>
+                        <p style={{
+                            color: '#C53030',
+                            fontSize: 13,
+                            marginTop: 12,
+                            padding: '8px 12px',
+                            background: 'rgba(197, 48, 48, 0.08)',
+                            borderRadius: 8
+                        }}>
+                            {error}
+                        </p>
                     )}
-                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+
+                    <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{
+                            opacity: isFocused ? 1 : 0,
+                            height: isFocused ? 'auto' : 0
+                        }}
+                        style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            marginTop: 16,
+                            overflow: 'hidden'
+                        }}
+                    >
+                        <div style={{ display: 'flex', gap: 8 }}>
+                            <button type="button" className="btn-icon" style={{ width: 40, height: 40 }}>
+                                <FiImage size={18} />
+                            </button>
+                        </div>
+
                         <motion.button
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                             type="submit"
                             disabled={loading || !content.trim()}
-                            className="btn btn-primary"
                             style={{
-                                opacity: loading || !content.trim() ? 0.6 : 1,
-                                gap: 8
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 8,
+                                padding: '12px 24px',
+                                background: content.trim() ? 'var(--ink)' : 'var(--sand)',
+                                color: content.trim() ? 'var(--ivory)' : 'var(--mist)',
+                                border: 'none',
+                                borderRadius: 100,
+                                fontSize: 14,
+                                fontWeight: 600,
+                                cursor: content.trim() ? 'pointer' : 'not-allowed',
+                                transition: 'all 200ms ease'
                             }}
                         >
                             {loading ? 'Posting...' : 'Share'}
-                            <FiSend size={16} />
+                            <FiSend size={14} />
                         </motion.button>
-                    </div>
+                    </motion.div>
                 </form>
             </div>
-        </div>
+        </motion.div>
     );
 };
 
