@@ -40,7 +40,6 @@ const Network = () => {
                 method: 'PUT',
                 headers: getAuthHeader()
             });
-            // Refresh data
             fetchData();
         } catch (error) {
             console.error('Failed to accept request:', error);
@@ -74,38 +73,48 @@ const Network = () => {
     const tabs = [
         { id: 'friends', label: 'Connections', icon: FiUsers, count: friends.length },
         { id: 'pending', label: 'Requests', icon: FiUserCheck, count: pending.length },
-        { id: 'suggestions', label: 'Suggestions', icon: FiUserPlus, count: suggestions.length }
+        { id: 'suggestions', label: 'Explore', icon: FiUserPlus, count: suggestions.length }
     ];
 
-    if (loading) {
-        return (
-            <div className="flex justify-center p-6">
-                <div className="spinner" />
-            </div>
-        );
-    }
-
     return (
-        <div className="animate-fadeIn">
-            <h1 style={{ marginBottom: 24 }}>Network</h1>
+        <div className="layout-content">
+            <header style={{ marginBottom: 48 }}>
+                <h1 className="t-headline-1">Network</h1>
+                <p className="t-subhead">Manage your professional ecosystem.</p>
+            </header>
 
-            {/* Tabs */}
-            <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
+            {/* Tab Navigation - Architect Style */}
+            <div style={{
+                display: 'flex',
+                gap: 32,
+                marginBottom: 48,
+                borderBottom: '1px solid var(--border-subtle)'
+            }}>
                 {tabs.map(tab => (
                     <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`btn ${activeTab === tab.id ? 'btn-primary' : 'btn-secondary'}`}
-                        style={{ display: 'flex', alignItems: 'center', gap: 8 }}
+                        style={{
+                            background: 'transparent',
+                            border: 'none',
+                            padding: '0 0 16px 0',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 8,
+                            borderBottom: activeTab === tab.id ? '2px solid var(--color-gold-buff)' : '2px solid transparent',
+                            color: activeTab === tab.id ? 'var(--text-primary)' : 'var(--text-tertiary)',
+                            transition: 'all 0.3s ease',
+                            fontFamily: 'var(--font-serif)',
+                            fontSize: '1.25rem'
+                        }}
                     >
-                        <tab.icon size={18} />
+                        <tab.icon size={20} />
                         {tab.label}
                         {tab.count > 0 && (
-                            <span style={{
-                                background: activeTab === tab.id ? 'rgba(255,255,255,0.2)' : 'var(--color-medium-gray)',
-                                padding: '2px 8px',
-                                borderRadius: 999,
-                                fontSize: 12
+                            <span className="badge" style={{
+                                background: activeTab === tab.id ? 'var(--color-gold-buff)' : 'var(--border-prominent)',
+                                color: activeTab === tab.id ? '#FFF' : 'var(--text-tertiary)'
                             }}>
                                 {tab.count}
                             </span>
@@ -114,96 +123,83 @@ const Network = () => {
                 ))}
             </div>
 
-            {/* Content */}
-            {activeTab === 'friends' && (
-                <div>
-                    {friends.length === 0 ? (
-                        <div className="empty-state">
-                            <FiUsers size={48} />
-                            <p>No connections yet. Start by sending requests!</p>
-                        </div>
-                    ) : (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                            {friends.map(friend => (
-                                <UserCard key={friend.id} user={friend} />
-                            ))}
-                        </div>
-                    )}
-                </div>
-            )}
+            {/* Content Grid */}
+            <div className="grid-12">
+                {activeTab === 'friends' && (
+                    <div style={{ gridColumn: '1 / -1' }}>
+                        {friends.length === 0 ? (
+                            <div style={{ padding: 48, textAlign: 'center', color: 'var(--text-tertiary)' }}>
+                                <FiUsers size={48} style={{ marginBottom: 16, opacity: 0.5 }} />
+                                <p>No connections yet. Start by exploring.</p>
+                            </div>
+                        ) : (
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 24 }}>
+                                {friends.map(friend => (
+                                    <div key={friend.id} className="card" style={{ padding: 0 }}>
+                                        <UserCard user={friend} />
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                )}
 
-            {activeTab === 'pending' && (
-                <div>
-                    {pending.length === 0 ? (
-                        <div className="empty-state">
-                            <FiUserCheck size={48} />
-                            <p>No pending requests</p>
-                        </div>
-                    ) : (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                            {pending.map(request => (
-                                <motion.div
-                                    key={request.request_id}
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    className="card"
-                                    style={{ display: 'flex', alignItems: 'center', gap: 16, padding: 16 }}
-                                >
-                                    <div className="avatar avatar-lg">
-                                        {request.avatar_url ? (
-                                            <img src={request.avatar_url} alt={request.name} />
-                                        ) : (
-                                            request.name?.charAt(0).toUpperCase()
-                                        )}
-                                    </div>
-                                    <div style={{ flex: 1 }}>
-                                        <h4>{request.name}</h4>
-                                        <p style={{ fontSize: 13, color: 'var(--color-muted)' }}>
-                                            @{request.user_id}
-                                        </p>
-                                    </div>
-                                    <div style={{ display: 'flex', gap: 8 }}>
-                                        <button
-                                            onClick={() => handleReject(request.request_id)}
-                                            className="btn btn-secondary btn-sm"
-                                        >
-                                            Decline
-                                        </button>
-                                        <button
-                                            onClick={() => handleAccept(request.request_id)}
-                                            className="btn btn-primary btn-sm"
-                                        >
-                                            Accept
-                                        </button>
-                                    </div>
+                {activeTab === 'pending' && (
+                    <div style={{ gridColumn: 'span 8' }}>
+                        {pending.length === 0 ? (
+                            <div style={{ padding: 48, textAlign: 'center', color: 'var(--text-tertiary)' }}>
+                                <p>No pending requests.</p>
+                            </div>
+                        ) : (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                                {pending.map(request => (
+                                    <motion.div
+                                        key={request.request_id}
+                                        initial={{ opacity: 0, x: -10 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        className="card"
+                                        style={{ display: 'flex', alignItems: 'center', gap: 24, padding: 24 }}
+                                    >
+                                        <div className="avatar-ring" style={{ width: 56, height: 56 }}>
+                                            {request.avatar_url ? (
+                                                <img src={request.avatar_url} alt={request.name} className="avatar" />
+                                            ) : (
+                                                <div className="avatar" style={{ background: 'var(--color-obsidian)', color: '#FFF', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>
+                                                    {request.name?.charAt(0).toUpperCase()}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div style={{ flex: 1 }}>
+                                            <h4 style={{ fontSize: '1.25rem', marginBottom: 4 }}>{request.name}</h4>
+                                            <p style={{ color: 'var(--text-tertiary)', fontSize: 14 }}>@{request.user_id}</p>
+                                        </div>
+                                        <div style={{ display: 'flex', gap: 12 }}>
+                                            <button onClick={() => handleReject(request.request_id)} className="btn btn-ghost">Decline</button>
+                                            <button onClick={() => handleAccept(request.request_id)} className="btn btn-primary">Accept</button>
+                                        </div>
+                                    </motion.div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                )}
+
+                {activeTab === 'suggestions' && (
+                    <div style={{ gridColumn: '1 / -1' }}>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 24 }}>
+                            {suggestions.map(user => (
+                                <motion.div key={user.id} layout className="card" style={{ padding: 0 }}>
+                                    <UserCard
+                                        user={user}
+                                        action={() => handleConnect(user.id)}
+                                        actionLabel="Connect"
+                                    />
                                 </motion.div>
                             ))}
                         </div>
-                    )}
-                </div>
-            )}
-
-            {activeTab === 'suggestions' && (
-                <div>
-                    {suggestions.length === 0 ? (
-                        <div className="empty-state">
-                            <FiUserPlus size={48} />
-                            <p>No suggestions at the moment</p>
-                        </div>
-                    ) : (
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                            {suggestions.map(user => (
-                                <UserCard
-                                    key={user.id}
-                                    user={user}
-                                    action={() => handleConnect(user.id)}
-                                    actionLabel="Connect"
-                                />
-                            ))}
-                        </div>
-                    )}
-                </div>
-            )}
+                    </div>
+                )}
+            </div>
         </div>
     );
 };

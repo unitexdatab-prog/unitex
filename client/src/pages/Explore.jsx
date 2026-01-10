@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
-import { FiSearch, FiTrendingUp, FiUsers, FiArrowRight } from 'react-icons/fi';
+import { FiSearch, FiTrendingUp, FiUsers, FiArrowRight, FiActivity } from 'react-icons/fi';
 
 const Explore = () => {
     const { getAuthHeader } = useAuth();
@@ -61,43 +61,20 @@ const Explore = () => {
     };
 
     return (
-        <div className="animate-fadeIn">
-            {/* Header */}
-            <motion.header
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                style={{ marginBottom: 40 }}
-            >
-                <span className="text-overline" style={{ marginBottom: 8, display: 'block' }}>
-                    Discover
-                </span>
-                <h1 style={{
-                    fontFamily: 'Playfair Display, serif',
-                    fontSize: 'clamp(2rem, 4vw, 3rem)',
-                    fontWeight: 500
-                }}>
-                    Explore
-                </h1>
-            </motion.header>
+        <div className="layout-content">
+            <header style={{ marginBottom: 48, textAlign: 'center' }}>
+                <span className="t-label" style={{ marginBottom: 16 }}>The Network</span>
+                <h1 className="t-headline-1" style={{ fontSize: '3rem', marginBottom: 24 }}>Explore</h1>
 
-            {/* Search */}
-            <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.1 }}
-                style={{ marginBottom: 48 }}
-            >
-                <div style={{
-                    position: 'relative',
-                    maxWidth: 600
-                }}>
+                <div style={{ position: 'relative', maxWidth: 640, margin: '0 auto' }}>
                     <FiSearch style={{
                         position: 'absolute',
-                        left: 20,
+                        left: 24,
                         top: '50%',
                         transform: 'translateY(-50%)',
-                        color: 'var(--mist)',
-                        pointerEvents: 'none'
+                        color: 'var(--text-tertiary)',
+                        pointerEvents: 'none',
+                        zIndex: 2
                     }} size={20} />
                     <input
                         type="text"
@@ -106,206 +83,150 @@ const Explore = () => {
                             setQuery(e.target.value);
                             handleSearch(e.target.value);
                         }}
-                        placeholder="Search people, spaces, topics..."
+                        className="input-field"
+                        placeholder="Search for architects, spaces, or ideas..."
                         style={{
-                            width: '100%',
-                            padding: '20px 20px 20px 52px',
-                            background: 'var(--ivory)',
-                            border: '2px solid transparent',
-                            borderRadius: 20,
-                            fontSize: 16,
-                            color: 'var(--ink)',
-                            transition: 'all 200ms ease'
-                        }}
-                        onFocus={(e) => {
-                            e.target.style.borderColor = 'var(--gold)';
-                            e.target.style.boxShadow = '0 0 0 4px rgba(166, 139, 91, 0.1)';
-                        }}
-                        onBlur={(e) => {
-                            e.target.style.borderColor = 'transparent';
-                            e.target.style.boxShadow = 'none';
+                            paddingLeft: 56,
+                            height: 64,
+                            borderRadius: 'var(--radius-pill)',
+                            fontSize: '1.25rem',
+                            boxShadow: '0 8px 32px rgba(0,0,0,0.05)'
                         }}
                     />
                 </div>
-            </motion.div>
+            </header>
 
-            {/* Search Results */}
-            {query && (
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    style={{ marginBottom: 48 }}
-                >
-                    {loading ? (
-                        <div className="spinner" style={{ margin: '40px auto' }} />
-                    ) : (
-                        <>
-                            {results.users?.length > 0 && (
-                                <div style={{ marginBottom: 32 }}>
-                                    <h3 style={{ marginBottom: 16, fontSize: 14, color: 'var(--mist)', textTransform: 'uppercase', letterSpacing: 1 }}>
-                                        People
-                                    </h3>
-                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                                        {results.users.map(user => (
-                                            <Link key={user.id} to={`/profile/${user.id}`}>
-                                                <motion.div
-                                                    whileHover={{ x: 4 }}
-                                                    className="card"
-                                                    style={{
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        gap: 16,
-                                                        padding: 16
-                                                    }}
-                                                >
-                                                    <div className="avatar">
-                                                        {user.name?.charAt(0).toUpperCase()}
+            <div className="grid-12">
+                {query ? (
+                    <div style={{ gridColumn: 'span 12' }}>
+                        {loading ? (
+                            <div style={{ padding: 64, textAlign: 'center' }}><div className="spinner" /></div>
+                        ) : (
+                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                                {results.users?.length > 0 && (
+                                    <div style={{ marginBottom: 48 }}>
+                                        <h3 className="t-label" style={{ marginBottom: 24 }}>People</h3>
+                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
+                                            {results.users.map(user => (
+                                                <Link key={user.id} to={`/profile/${user.id}`} style={{ textDecoration: 'none' }}>
+                                                    <div className="card card-hover" style={{ display: 'flex', alignItems: 'center', gap: 16, padding: 16 }}>
+                                                        <div className="avatar">{user.name?.charAt(0).toUpperCase()}</div>
+                                                        <div>
+                                                            <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{user.name}</div>
+                                                            <div style={{ fontSize: 13, color: 'var(--text-tertiary)' }}>@{user.user_id}</div>
+                                                        </div>
+                                                        <div className="badge" style={{ marginLeft: 'auto' }}>{user.xp} XP</div>
                                                     </div>
-                                                    <div style={{ flex: 1 }}>
-                                                        <div style={{ fontWeight: 600 }}>{user.name}</div>
-                                                        <div style={{ fontSize: 13, color: 'var(--mist)' }}>@{user.user_id}</div>
-                                                    </div>
-                                                    <div className="xp-badge">{user.xp} XP</div>
-                                                </motion.div>
-                                            </Link>
-                                        ))}
+                                                </Link>
+                                            ))}
+                                        </div>
                                     </div>
-                                </div>
-                            )}
-                        </>
-                    )}
-                </motion.div>
-            )}
+                                )}
 
-            {/* Suggested Connections */}
-            {!query && suggestions.length > 0 && (
-                <motion.section
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
-                    style={{ marginBottom: 48 }}
-                >
-                    <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 12,
-                        marginBottom: 24
-                    }}>
-                        <FiUsers style={{ color: 'var(--gold)' }} />
-                        <span className="text-overline">Suggested for you</span>
-                        <div style={{ flex: 1, height: 1, background: 'var(--sand)' }} />
-                    </div>
+                                {results.spaces?.length > 0 && (
+                                    <div>
+                                        <h3 className="t-label" style={{ marginBottom: 24 }}>Spaces</h3>
+                                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: 16 }}>
+                                            {results.spaces.map(space => (
+                                                <Link key={space.id} to={`/spaces/${space.id}`} style={{ textDecoration: 'none' }}>
+                                                    <div className="card card-hover" style={{ padding: 20 }}>
+                                                        <h4 className="t-headline-2" style={{ fontSize: '1.1rem', marginBottom: 4 }}>{space.name}</h4>
+                                                        <p style={{ fontSize: 13, color: 'var(--text-tertiary)' }}>{space.category}</p>
+                                                    </div>
+                                                </Link>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
 
-                    <div style={{
-                        display: 'grid',
-                        gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
-                        gap: 16
-                    }}>
-                        {suggestions.slice(0, 4).map((user, i) => (
-                            <motion.div
-                                key={user.id}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.2 + i * 0.05 }}
-                                className="card"
-                                style={{ textAlign: 'center', padding: 24 }}
-                            >
-                                <div className="avatar avatar-lg" style={{ margin: '0 auto 16px' }}>
-                                    {user.name?.charAt(0).toUpperCase()}
-                                </div>
-                                <h4 style={{ marginBottom: 4 }}>{user.name}</h4>
-                                <p style={{ fontSize: 13, color: 'var(--mist)', marginBottom: 12 }}>
-                                    @{user.user_id}
-                                </p>
-                                <div className="xp-badge" style={{ marginBottom: 16 }}>
-                                    {user.xp} XP
-                                </div>
-                                <motion.button
-                                    whileHover={{ scale: 1.02 }}
-                                    whileTap={{ scale: 0.98 }}
-                                    onClick={() => handleConnect(user.id)}
-                                    style={{
-                                        width: '100%',
-                                        padding: '12px 20px',
-                                        background: 'var(--ink)',
-                                        color: 'var(--ivory)',
-                                        border: 'none',
-                                        borderRadius: 100,
-                                        fontSize: 13,
-                                        fontWeight: 600,
-                                        cursor: 'pointer'
-                                    }}
-                                >
-                                    Connect
-                                </motion.button>
+                                {results.users?.length === 0 && results.spaces?.length === 0 && (
+                                    <div style={{ textAlign: 'center', padding: 48, color: 'var(--text-tertiary)' }}>
+                                        <p>No blueprints found matching "{query}".</p>
+                                    </div>
+                                )}
                             </motion.div>
-                        ))}
+                        )}
                     </div>
-                </motion.section>
-            )}
+                ) : (
+                    <>
+                        {/* Suggestions Grid */}
+                        <div style={{ gridColumn: 'span 8' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 32 }}>
+                                <FiUsers size={20} color="var(--color-gold-buff)" />
+                                <h3 className="t-headline-2" style={{ margin: 0, fontSize: '1.5rem' }}>Suggested Connections</h3>
+                            </div>
 
-            {/* Trending Spaces */}
-            {!query && trending.length > 0 && (
-                <motion.section
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.3 }}
-                >
-                    <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: 12,
-                        marginBottom: 24
-                    }}>
-                        <FiTrendingUp style={{ color: 'var(--gold)' }} />
-                        <span className="text-overline">Trending spaces</span>
-                        <div style={{ flex: 1, height: 1, background: 'var(--sand)' }} />
-                    </div>
+                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 24 }}>
+                                {suggestions.slice(0, 6).map((user, i) => (
+                                    <motion.div
+                                        key={user.id}
+                                        initial={{ opacity: 0, y: 20 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: i * 0.1 }}
+                                        className="card"
+                                        style={{ padding: 24, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}
+                                    >
+                                        <div className="avatar-ring" style={{ width: 64, height: 64, marginBottom: 16 }}>
+                                            <div className="avatar" style={{ fontSize: 24 }}>{user.name?.charAt(0).toUpperCase()}</div>
+                                        </div>
+                                        <h4 style={{ fontSize: '1.1rem', fontWeight: 600, marginBottom: 4 }}>{user.name}</h4>
+                                        <p style={{ fontSize: 13, color: 'var(--text-tertiary)', marginBottom: 16 }}>@{user.user_id}</p>
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                        {trending.slice(0, 5).map((space, i) => (
-                            <Link key={space.id} to={`/spaces/${space.id}`}>
-                                <motion.div
-                                    initial={{ opacity: 0, x: -20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    transition={{ delay: 0.3 + i * 0.05 }}
-                                    whileHover={{ x: 8 }}
-                                    className="card"
-                                    style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: 16,
-                                        padding: 20
-                                    }}
-                                >
-                                    <div style={{
-                                        width: 48,
-                                        height: 48,
-                                        background: 'linear-gradient(135deg, var(--gold) 0%, var(--bronze) 100%)',
-                                        borderRadius: 14,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        color: 'var(--ivory)',
-                                        fontFamily: 'Playfair Display, serif',
-                                        fontSize: 20,
-                                        fontWeight: 500
-                                    }}>
-                                        {space.name?.charAt(0).toUpperCase()}
-                                    </div>
-                                    <div style={{ flex: 1 }}>
-                                        <h4>{space.name}</h4>
-                                        <p style={{ fontSize: 13, color: 'var(--mist)' }}>
-                                            {space.member_count} members · {space.category}
-                                        </p>
-                                    </div>
-                                    <FiArrowRight style={{ color: 'var(--mist)' }} />
-                                </motion.div>
-                            </Link>
-                        ))}
-                    </div>
-                </motion.section>
-            )}
+                                        <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
+                                            <span className="badge badge-gold">{user.xp} XP</span>
+                                        </div>
+
+                                        <button
+                                            onClick={() => handleConnect(user.id)}
+                                            className="btn btn-primary"
+                                            style={{ width: '100%', borderRadius: 'var(--radius-pill)' }}
+                                        >
+                                            Connect
+                                        </button>
+                                    </motion.div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Trending Sidebar */}
+                        <div style={{ gridColumn: 'span 4' }}>
+                            <div className="card" style={{ background: 'var(--color-obsidian)', color: '#FFF', border: 'none' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
+                                    <FiTrendingUp color="var(--color-gold-buff)" size={20} />
+                                    <h3 className="t-headline-2" style={{ margin: 0, fontSize: '1.25rem', color: '#FFF' }}>Trending Spaces</h3>
+                                </div>
+
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+                                    {trending.slice(0, 5).map((space, i) => (
+                                        <Link
+                                            key={space.id}
+                                            to={`/spaces/${space.id}`}
+                                            style={{ textDecoration: 'none', color: 'inherit' }}
+                                        >
+                                            <motion.div
+                                                whileHover={{ x: 4, backgroundColor: 'rgba(255,255,255,0.05)' }}
+                                                style={{
+                                                    padding: '16px 0',
+                                                    borderBottom: i !== trending.length - 1 ? '1px solid rgba(255,255,255,0.1)' : 'none',
+                                                    display: 'flex',
+                                                    alignItems: 'center',
+                                                    justifyContent: 'space-between'
+                                                }}
+                                            >
+                                                <div>
+                                                    <div style={{ fontWeight: 500, marginBottom: 4 }}>{space.name}</div>
+                                                    <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)' }}>{space.member_count} architects</div>
+                                                </div>
+                                                <FiArrowRight color="rgba(255,255,255,0.3)" />
+                                            </motion.div>
+                                        </Link>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </>
+                )}
+            </div>
         </div>
     );
 };

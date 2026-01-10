@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { motion } from 'framer-motion';
-import { FiCopy, FiCheck, FiGift, FiUser, FiBell, FiEye } from 'react-icons/fi';
+import { FiCopy, FiCheck, FiGift, FiUser, FiBell, FiEye, FiSettings, FiShield } from 'react-icons/fi';
 
 const Settings = () => {
     const { user, getAuthHeader, updateUser } = useAuth();
@@ -59,144 +59,208 @@ const Settings = () => {
 
     if (loading) {
         return (
-            <div className="flex justify-center p-6">
+            <div style={{ padding: 64, textAlign: 'center' }}>
                 <div className="spinner" />
             </div>
         );
     }
 
     const tabs = [
-        { id: 'profile', label: 'Profile', icon: FiUser },
-        { id: 'referral', label: 'Referral', icon: FiGift },
+        { id: 'profile', label: 'Profile & Privacy', icon: FiUser },
+        { id: 'referral', label: 'Referrals', icon: FiGift },
         { id: 'notifications', label: 'Notifications', icon: FiBell }
     ];
 
     return (
-        <div className="animate-fadeIn">
-            <h1 style={{ marginBottom: 24 }}>Settings</h1>
+        <div className="layout-content">
+            <header style={{ marginBottom: 48 }}>
+                <h1 className="t-headline-1">Settings</h1>
+                <p className="t-subhead">Configure your architect profile.</p>
+            </header>
 
-            {/* Tabs */}
-            <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
+            {/* Tab Navigation */}
+            <div style={{
+                display: 'flex',
+                gap: 32,
+                marginBottom: 48,
+                borderBottom: '1px solid var(--border-subtle)'
+            }}>
                 {tabs.map(tab => (
                     <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`btn ${activeTab === tab.id ? 'btn-primary' : 'btn-secondary'}`}
+                        style={{
+                            background: 'transparent',
+                            border: 'none',
+                            padding: '0 0 16px 0',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 8,
+                            borderBottom: activeTab === tab.id ? '2px solid var(--color-gold-buff)' : '2px solid transparent',
+                            color: activeTab === tab.id ? 'var(--text-primary)' : 'var(--text-tertiary)',
+                            transition: 'all 0.3s ease',
+                            fontFamily: 'var(--font-serif)',
+                            fontSize: '1.25rem'
+                        }}
                     >
-                        <tab.icon size={18} />
+                        <tab.icon size={20} />
                         {tab.label}
                     </button>
                 ))}
             </div>
 
-            {/* Profile Settings */}
-            {activeTab === 'profile' && (
-                <div className="card">
-                    <h3 style={{ marginBottom: 20 }}>Privacy</h3>
-
-                    <div style={{ marginBottom: 20 }}>
-                        <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                            <FiEye size={18} />
-                            Profile Visibility
-                        </label>
-                        <select
-                            value={settings?.profile_visibility || 'public'}
-                            onChange={(e) => updateSettings({ profileVisibility: e.target.value })}
-                            className="input"
-                            style={{ maxWidth: 200 }}
-                        >
-                            <option value="public">Public</option>
-                            <option value="connections">Connections Only</option>
-                            <option value="private">Private</option>
-                        </select>
-                    </div>
-                </div>
-            )}
-
-            {/* Referral */}
-            {activeTab === 'referral' && (
-                <div>
-                    <div className="card" style={{ marginBottom: 24 }}>
-                        <h3 style={{ marginBottom: 16 }}>Your Referral Code</h3>
-                        <p style={{ color: 'var(--color-muted)', marginBottom: 16 }}>
-                            Share your code to earn +100 XP for each new user who signs up!
-                        </p>
-
-                        <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                            <div style={{
-                                background: 'var(--color-silver)',
-                                padding: '12px 24px',
-                                borderRadius: 12,
-                                fontFamily: 'monospace',
-                                fontSize: 20,
-                                fontWeight: 700,
-                                letterSpacing: 2
-                            }}>
-                                {referralCode}
+            <div className="grid-12">
+                <div style={{ gridColumn: 'span 8' }}>
+                    {/* Profile Settings */}
+                    {activeTab === 'profile' && (
+                        <div className="card">
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24 }}>
+                                <div style={{
+                                    width: 48,
+                                    height: 48,
+                                    background: 'var(--color-marble)',
+                                    borderRadius: 12,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center'
+                                }}>
+                                    <FiShield size={24} color="var(--color-void)" />
+                                </div>
+                                <h3 className="t-headline-2" style={{ fontSize: '1.5rem', margin: 0 }}>Privacy</h3>
                             </div>
-                            <motion.button
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                onClick={copyReferralCode}
-                                className="btn btn-primary"
-                            >
-                                {copied ? <FiCheck /> : <FiCopy />}
-                                {copied ? 'Copied!' : 'Copy'}
-                            </motion.button>
+
+                            <div style={{ marginBottom: 32 }}>
+                                <label className="input-label" style={{ marginBottom: 12, display: 'block' }}>
+                                    PROFILE VISIBILITY
+                                </label>
+                                <div style={{ position: 'relative', maxWidth: 300 }}>
+                                    <select
+                                        value={settings?.profile_visibility || 'public'}
+                                        onChange={(e) => updateSettings({ profileVisibility: e.target.value })}
+                                        className="input-field"
+                                    >
+                                        <option value="public">Public (Recommended)</option>
+                                        <option value="connections">Connections Only</option>
+                                        <option value="private">Private</option>
+                                    </select>
+                                    <FiEye style={{ position: 'absolute', right: 16, top: 16, pointerEvents: 'none', color: 'var(--text-tertiary)' }} />
+                                </div>
+                                <p style={{ fontSize: 13, color: 'var(--text-tertiary)', marginTop: 8 }}>
+                                    Control who looks at your blueprints.
+                                </p>
+                            </div>
                         </div>
-                    </div>
+                    )}
 
-                    <div className="card">
-                        <h3 style={{ marginBottom: 16 }}>Your Referrals ({referrals.length})</h3>
-                        {referrals.length === 0 ? (
-                            <p className="text-muted">No referrals yet. Share your code to get started!</p>
-                        ) : (
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                                {referrals.map(ref => (
-                                    <div key={ref.id} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                                        <div className="avatar">
-                                            {ref.name?.charAt(0).toUpperCase()}
-                                        </div>
-                                        <div>
-                                            <strong>{ref.name}</strong>
-                                            <p style={{ fontSize: 13, color: 'var(--color-muted)' }}>
-                                                @{ref.user_id}
-                                            </p>
-                                        </div>
-                                        <span className="xp-badge" style={{ marginLeft: 'auto' }}>
-                                            +100 XP
-                                        </span>
+                    {/* Referral */}
+                    {activeTab === 'referral' && (
+                        <div>
+                            <div className="card" style={{
+                                marginBottom: 24,
+                                background: 'linear-gradient(135deg, var(--color-obsidian) 0%, #2a2a2a 100%)',
+                                color: '#FFF'
+                            }}>
+                                <h3 className="t-headline-2" style={{ color: 'var(--color-gold-buff)', fontSize: '1.5rem', marginBottom: 16 }}>Legacy Code</h3>
+                                <p style={{ color: 'rgba(255,255,255,0.7)', marginBottom: 32, maxWidth: '80%' }}>
+                                    Grant access to fellow architects. You earn <strong>+100 XP</strong> for every successful recruit.
+                                </p>
+
+                                <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+                                    <div style={{
+                                        background: 'rgba(255,255,255,0.1)',
+                                        border: '1px solid rgba(255,255,255,0.2)',
+                                        padding: '16px 32px',
+                                        borderRadius: 16,
+                                        fontFamily: 'monospace',
+                                        fontSize: 24,
+                                        fontWeight: 700,
+                                        letterSpacing: 4,
+                                        color: '#FFF'
+                                    }}>
+                                        {referralCode}
                                     </div>
-                                ))}
+                                    <motion.button
+                                        whileHover={{ scale: 1.05 }}
+                                        whileTap={{ scale: 0.95 }}
+                                        onClick={copyReferralCode}
+                                        className="btn"
+                                        style={{
+                                            background: 'var(--color-gold-buff)',
+                                            color: '#000',
+                                            height: 56,
+                                            padding: '0 24px'
+                                        }}
+                                    >
+                                        {copied ? <FiCheck size={20} /> : <FiCopy size={20} />}
+                                        <span style={{ marginLeft: 8, fontWeight: 600 }}>{copied ? 'COPIED' : 'COPY CODE'}</span>
+                                    </motion.button>
+                                </div>
                             </div>
-                        )}
-                    </div>
-                </div>
-            )}
 
-            {/* Notifications */}
-            {activeTab === 'notifications' && (
-                <div className="card">
-                    <h3 style={{ marginBottom: 20 }}>Notification Preferences</h3>
+                            <div className="card">
+                                <h3 className="t-headline-2" style={{ fontSize: '1.25rem', marginBottom: 24 }}>Your Recruits ({referrals.length})</h3>
+                                {referrals.length === 0 ? (
+                                    <div style={{ textAlign: 'center', padding: 32, color: 'var(--text-tertiary)' }}>
+                                        <FiGift size={32} style={{ marginBottom: 16, opacity: 0.5 }} />
+                                        <p>No referrals yet. Share your code to start building your network.</p>
+                                    </div>
+                                ) : (
+                                    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                                        {referrals.map(ref => (
+                                            <div key={ref.id} style={{
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'space-between',
+                                                padding: 16,
+                                                background: 'var(--bg-app)',
+                                                borderRadius: 12
+                                            }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                                                    <div className="avatar" style={{ width: 40, height: 40, fontSize: 16 }}>
+                                                        {ref.name?.charAt(0).toUpperCase()}
+                                                    </div>
+                                                    <div>
+                                                        <strong>{ref.name}</strong>
+                                                        <p style={{ fontSize: 13, color: 'var(--text-tertiary)' }}>@{ref.user_id}</p>
+                                                    </div>
+                                                </div>
+                                                <span className="badge badge-gold">
+                                                    +100 XP
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    )}
 
-                    <div>
-                        <label style={{ display: 'block', marginBottom: 8, fontWeight: 500 }}>
-                            Notification Intensity
-                        </label>
-                        <select
-                            value={settings?.notification_intensity || 'balanced'}
-                            onChange={(e) => updateSettings({ notificationIntensity: e.target.value })}
-                            className="input"
-                            style={{ maxWidth: 200 }}
-                        >
-                            <option value="all">All Notifications</option>
-                            <option value="balanced">Balanced</option>
-                            <option value="minimal">Minimal</option>
-                            <option value="none">None</option>
-                        </select>
-                    </div>
+                    {/* Notifications */}
+                    {activeTab === 'notifications' && (
+                        <div className="card">
+                            <h3 className="t-headline-2" style={{ fontSize: '1.5rem', marginBottom: 24 }}>Signals</h3>
+
+                            <div>
+                                <label className="input-label" style={{ marginBottom: 12, display: 'block' }}>
+                                    INTENSITY
+                                </label>
+                                <select
+                                    value={settings?.notification_intensity || 'balanced'}
+                                    onChange={(e) => updateSettings({ notificationIntensity: e.target.value })}
+                                    className="input-field"
+                                    style={{ maxWidth: 300 }}
+                                >
+                                    <option value="all">Everything (High Noise)</option>
+                                    <option value="balanced">Balanced (Recommended)</option>
+                                    <option value="minimal">Focus Mode (Minimal)</option>
+                                    <option value="none">Silence (None)</option>
+                                </select>
+                            </div>
+                        </div>
+                    )}
                 </div>
-            )}
+            </div>
         </div>
     );
 };

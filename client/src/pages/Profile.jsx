@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import PostCard from '../components/PostCard';
 import { motion } from 'framer-motion';
-import { FiGithub, FiLinkedin, FiTwitter, FiEdit2 } from 'react-icons/fi';
+import { FiGithub, FiLinkedin, FiTwitter, FiEdit2, FiMapPin, FiBriefcase, FiLink } from 'react-icons/fi';
 
 const Profile = () => {
     const { id } = useParams();
@@ -41,8 +41,7 @@ const Profile = () => {
                 workingOn: profileData.working_on || ''
             });
 
-            // Check friendship status if not own profile
-            if (!isOwnProfile) {
+            if (!isOwnProfile && currentUser) {
                 const statusRes = await fetch(`/api/friends/status/${id}`, {
                     headers: getAuthHeader()
                 });
@@ -84,159 +83,152 @@ const Profile = () => {
         }
     };
 
-    if (loading) {
-        return (
-            <div className="flex justify-center p-6">
-                <div className="spinner" />
-            </div>
-        );
-    }
-
-    if (!profile) {
-        return <div className="empty-state">User not found</div>;
-    }
+    if (loading) return <div style={{ padding: 64, textAlign: 'center' }}><div className="spinner" /></div>;
+    if (!profile) return <div style={{ padding: 64, textAlign: 'center' }}>User not found</div>;
 
     return (
-        <div className="animate-fadeIn">
-            {/* Header */}
-            <div className="card" style={{ marginBottom: 24 }}>
-                <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
-                    {/* Avatar */}
-                    <div className="avatar avatar-xl">
-                        {profile.avatar_url ? (
-                            <img src={profile.avatar_url} alt={profile.name} />
-                        ) : (
-                            profile.name?.charAt(0).toUpperCase()
-                        )}
+        <div className="layout-content">
+            {/* Profile Header Card */}
+            <div className="card" style={{ marginBottom: 48, overflow: 'hidden', padding: 0 }}>
+                {/* Cover Area (Abstract) */}
+                <div style={{ height: 160, background: 'linear-gradient(135deg, var(--color-void) 0%, var(--color-matter) 100%)', position: 'relative' }}>
+                    <div style={{
+                        position: 'absolute',
+                        bottom: -48,
+                        left: 48,
+                        padding: 6,
+                        background: 'var(--bg-app)',
+                        borderRadius: 'var(--radius-soft)'
+                    }}>
+                        <div className="avatar" style={{
+                            width: 96,
+                            height: 96,
+                            fontSize: 32,
+                            borderRadius: '14px'
+                        }}>
+                            {profile.avatar_url ? (
+                                <img src={profile.avatar_url} alt={profile.name} />
+                            ) : (
+                                profile.name?.charAt(0).toUpperCase()
+                            )}
+                        </div>
                     </div>
+                </div>
 
-                    {/* Info */}
-                    <div style={{ flex: 1, minWidth: 200 }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+                <div style={{ padding: '64px 48px 48px 48px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 24 }}>
+                        <div>
                             {isEditing ? (
                                 <input
                                     type="text"
                                     value={editForm.name}
                                     onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
-                                    className="input"
-                                    style={{ maxWidth: 200 }}
+                                    className="input-field"
+                                    style={{ fontSize: '2rem', fontWeight: 700, fontFamily: 'var(--font-serif)', marginBottom: 8 }}
                                 />
                             ) : (
-                                <h1>{profile.name}</h1>
+                                <h1 className="t-headline-1" style={{ fontSize: '2.5rem', marginBottom: 8 }}>{profile.name}</h1>
                             )}
-                            <span className="xp-badge">{profile.xp || 0} XP</span>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 12, color: 'var(--text-secondary)' }}>
+                                <span>@{profile.user_id}</span>
+                                <span style={{ width: 4, height: 4, background: 'var(--text-tertiary)', borderRadius: '50%' }} />
+                                <span className="badge badge-gold">{profile.xp || 0} XP</span>
+                            </div>
                         </div>
 
-                        <p style={{ color: 'var(--color-muted)', marginBottom: 12 }}>
-                            @{profile.user_id}
-                        </p>
-
-                        {isEditing ? (
-                            <textarea
-                                value={editForm.bio}
-                                onChange={(e) => setEditForm({ ...editForm, bio: e.target.value })}
-                                className="input textarea"
-                                placeholder="Tell us about yourself..."
-                                style={{ marginBottom: 12 }}
-                            />
-                        ) : profile.bio && (
-                            <p style={{ marginBottom: 12 }}>{profile.bio}</p>
-                        )}
-
-                        {/* Social Links */}
-                        <div style={{ display: 'flex', gap: 12, marginBottom: 12 }}>
-                            {profile.github_url && (
-                                <a href={profile.github_url} target="_blank" rel="noopener noreferrer">
-                                    <FiGithub size={20} />
-                                </a>
+                        <div>
+                            {isOwnProfile ? (
+                                isEditing ? (
+                                    <div style={{ display: 'flex', gap: 12 }}>
+                                        <button onClick={() => setIsEditing(false)} className="btn btn-ghost">Cancel</button>
+                                        <button onClick={handleSaveProfile} className="btn btn-primary">Save Changes</button>
+                                    </div>
+                                ) : (
+                                    <button onClick={() => setIsEditing(true)} className="btn btn-ghost">
+                                        <FiEdit2 size={16} /> Edit Profile
+                                    </button>
+                                )
+                            ) : friendStatus?.status === 'accepted' ? (
+                                <span className="badge badge-gold" style={{ fontSize: '1rem', padding: '8px 16px' }}>Connected</span>
+                            ) : friendStatus?.status === 'pending' ? (
+                                <span className="badge">Request Sent</span>
+                            ) : (
+                                <button onClick={handleConnect} className="btn btn-primary">Connect</button>
                             )}
-                            {profile.linkedin_url && (
-                                <a href={profile.linkedin_url} target="_blank" rel="noopener noreferrer">
-                                    <FiLinkedin size={20} />
-                                </a>
-                            )}
-                            {profile.twitter_url && (
-                                <a href={profile.twitter_url} target="_blank" rel="noopener noreferrer">
-                                    <FiTwitter size={20} />
-                                </a>
-                            )}
-                        </div>
-
-                        {/* Stats */}
-                        <div style={{ display: 'flex', gap: 24 }}>
-                            <div>
-                                <strong>{profile.postCount || 0}</strong>
-                                <span style={{ color: 'var(--color-muted)', marginLeft: 4 }}>posts</span>
-                            </div>
-                            <div>
-                                <strong>{profile.connectionCount || 0}</strong>
-                                <span style={{ color: 'var(--color-muted)', marginLeft: 4 }}>connections</span>
-                            </div>
                         </div>
                     </div>
 
-                    {/* Actions */}
-                    <div>
-                        {isOwnProfile ? (
-                            isEditing ? (
-                                <div style={{ display: 'flex', gap: 8 }}>
-                                    <button onClick={() => setIsEditing(false)} className="btn btn-secondary btn-sm">
-                                        Cancel
-                                    </button>
-                                    <button onClick={handleSaveProfile} className="btn btn-primary btn-sm">
-                                        Save
-                                    </button>
-                                </div>
+                    <div className="grid-12">
+                        <div style={{ gridColumn: 'span 8' }}>
+                            {isEditing ? (
+                                <textarea
+                                    value={editForm.bio}
+                                    onChange={(e) => setEditForm({ ...editForm, bio: e.target.value })}
+                                    className="input-field"
+                                    placeholder="Tell your story..."
+                                    style={{ minHeight: 120 }}
+                                />
                             ) : (
-                                <motion.button
-                                    whileHover={{ scale: 1.02 }}
-                                    onClick={() => setIsEditing(true)}
-                                    className="btn btn-secondary btn-sm"
-                                >
-                                    <FiEdit2 size={16} />
-                                    Edit Profile
-                                </motion.button>
-                            )
-                        ) : friendStatus?.status === 'accepted' ? (
-                            <span className="tag tag-primary">Connected</span>
-                        ) : friendStatus?.status === 'pending' ? (
-                            <span className="tag">Request Sent</span>
+                                <p style={{ fontSize: '1.1rem', lineHeight: 1.6, color: 'var(--text-primary)', marginBottom: 24 }}>
+                                    {profile.bio || 'No biography yet.'}
+                                </p>
+                            )}
+
+                            <div style={{ display: 'flex', gap: 24, marginTop: 32 }}>
+                                <div style={{ display: 'flex', gap: 8 }}>
+                                    <FiGithub size={20} color="var(--text-tertiary)" />
+                                    <FiLinkedin size={20} color="var(--text-tertiary)" />
+                                    <FiTwitter size={20} color="var(--text-tertiary)" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style={{ gridColumn: 'span 4', borderLeft: '1px solid var(--border-subtle)', paddingLeft: 32 }}>
+                            <div style={{ display: 'flex', gap: 32, marginBottom: 32 }}>
+                                <div>
+                                    <div className="t-headline-2" style={{ fontSize: '1.5rem', marginBottom: 4 }}>{profile.postCount || 0}</div>
+                                    <div className="t-label">Posts</div>
+                                </div>
+                                <div>
+                                    <div className="t-headline-2" style={{ fontSize: '1.5rem', marginBottom: 4 }}>{profile.connectionCount || 0}</div>
+                                    <div className="t-label">Connections</div>
+                                </div>
+                            </div>
+
+                            {(profile.currently_exploring || isEditing) && (
+                                <div style={{ marginBottom: 24 }}>
+                                    <div className="t-label" style={{ marginBottom: 8 }}>Exploring</div>
+                                    {isEditing ? (
+                                        <input
+                                            value={editForm.currentlyExploring}
+                                            onChange={(e) => setEditForm({ ...editForm, currentlyExploring: e.target.value })}
+                                            className="input-field"
+                                        />
+                                    ) : (
+                                        <div style={{ fontSize: 15 }}>{profile.currently_exploring}</div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Content Feed */}
+            <div className="grid-12">
+                <div style={{ gridColumn: 'span 8' }}>
+                    <h3 className="t-headline-2" style={{ marginBottom: 24 }}>Recent Activity</h3>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+                        {posts.length === 0 ? (
+                            <div style={{ padding: 48, textAlign: 'center', color: 'var(--text-tertiary)' }}>No recent activity.</div>
                         ) : (
-                            <motion.button
-                                whileHover={{ scale: 1.02 }}
-                                onClick={handleConnect}
-                                className="btn btn-primary btn-sm"
-                            >
-                                Connect
-                            </motion.button>
+                            posts.map(post => (
+                                <PostCard key={post.id} post={post} />
+                            ))
                         )}
                     </div>
                 </div>
-
-                {/* Badges */}
-                {profile.badges?.length > 0 && (
-                    <div style={{ marginTop: 20, paddingTop: 20, borderTop: '1px solid var(--color-silver)' }}>
-                        <h4 style={{ marginBottom: 12 }}>Badges</h4>
-                        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                            {profile.badges.map(badge => (
-                                <span key={badge.id} className="tag" title={badge.description}>
-                                    {badge.icon} {badge.name}
-                                </span>
-                            ))}
-                        </div>
-                    </div>
-                )}
             </div>
-
-            {/* Posts */}
-            <h3 style={{ marginBottom: 16 }}>Posts</h3>
-            {posts.length === 0 ? (
-                <div className="empty-state">No posts yet</div>
-            ) : (
-                posts.map(post => (
-                    <PostCard key={post.id} post={post} />
-                ))
-            )}
         </div>
     );
 };

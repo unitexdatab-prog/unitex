@@ -1,44 +1,44 @@
 import { motion } from 'framer-motion';
-import { FiMap, FiCheck, FiCircle } from 'react-icons/fi';
+import { FiMap, FiCheck, FiCircle, FiTrendingUp } from 'react-icons/fi';
 
 const roadmaps = [
     {
         id: 1,
-        title: 'Frontend Development',
-        description: 'Master modern frontend technologies',
-        color: '#A68B5B',
+        title: 'Frontend Architecture',
+        description: 'Master modern frontend technologies and design systems.',
+        color: 'var(--color-gold-buff)',
         steps: [
-            { title: 'HTML & CSS Basics', completed: true },
-            { title: 'JavaScript Fundamentals', completed: true },
-            { title: 'React Framework', completed: false },
-            { title: 'State Management', completed: false },
-            { title: 'Testing & Deployment', completed: false }
+            { title: 'Information Architecture', completed: true },
+            { title: 'Component Design Patterns', completed: true },
+            { title: 'State Management Systems', completed: false },
+            { title: 'Performance Optimization', completed: false },
+            { title: 'Accessibility Standards', completed: false }
         ]
     },
     {
         id: 2,
-        title: 'Backend Development',
-        description: 'Build scalable server-side applications',
-        color: '#008080',
+        title: 'Backend Scalability',
+        description: 'Build robust, scalable server-side infrastructure.',
+        color: 'var(--color-bronze)',
         steps: [
-            { title: 'Node.js Basics', completed: true },
-            { title: 'Express.js & APIs', completed: false },
-            { title: 'Database Design', completed: false },
-            { title: 'Authentication', completed: false },
-            { title: 'Cloud Deployment', completed: false }
+            { title: 'API Design Principles', completed: true },
+            { title: 'Database Normalization', completed: false },
+            { title: 'Microservices Architecture', completed: false },
+            { title: 'Security Best Practices', completed: false },
+            { title: 'System Observability', completed: false }
         ]
     },
     {
         id: 3,
-        title: 'UI/UX Design',
-        description: 'Create beautiful user experiences',
-        color: '#FF7F50',
+        title: 'Product Strategy',
+        description: 'From ideation to launch and growth loops.',
+        color: 'var(--color-obsidian)',
         steps: [
-            { title: 'Design Principles', completed: false },
-            { title: 'Color & Typography', completed: false },
-            { title: 'Figma Mastery', completed: false },
-            { title: 'Prototyping', completed: false },
-            { title: 'User Research', completed: false }
+            { title: 'User Research Methods', completed: false },
+            { title: 'Value Proposition Design', completed: false },
+            { title: 'Metrics & Analytics', completed: false },
+            { title: 'Growth Mechanics', completed: false },
+            { title: 'Iterative Development', completed: false }
         ]
     }
 ];
@@ -50,106 +50,76 @@ const Roadmaps = () => {
     };
 
     return (
-        <div className="animate-fadeIn">
-            <h1 style={{ marginBottom: 8 }}>Roadmaps</h1>
-            <p style={{ color: 'var(--color-muted)', marginBottom: 24 }}>
-                Structured learning paths to guide your journey
-            </p>
+        <div className="layout-content">
+            <header style={{ marginBottom: 48 }}>
+                <h1 className="t-headline-1">Roadmaps</h1>
+                <p className="t-subhead">Structured paths for mastery.</p>
+            </header>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 24 }}>
+            <div className="grid-12">
                 {roadmaps.map((roadmap, index) => (
                     <motion.div
                         key={roadmap.id}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        className="card card-hover"
+                        className="card"
+                        style={{ gridColumn: 'span 4', display: 'flex', flexDirection: 'column' }} // 3 Cards per row
                     >
-                        <div style={{ display: 'flex', gap: 20 }}>
-                            {/* Left: Icon */}
+                        <div style={{ marginBottom: 24 }}>
                             <div style={{
-                                width: 56,
-                                height: 56,
+                                width: 48,
+                                height: 48,
                                 background: roadmap.color,
                                 borderRadius: 12,
                                 display: 'flex',
                                 alignItems: 'center',
                                 justifyContent: 'center',
-                                flexShrink: 0
+                                marginBottom: 16,
+                                color: '#FFF'
                             }}>
-                                <FiMap size={24} color="white" />
+                                <FiMap size={24} />
+                            </div>
+                            <h3 className="t-headline-2" style={{ fontSize: '1.25rem', marginBottom: 8 }}>{roadmap.title}</h3>
+                            <p style={{ fontSize: 14, color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                                {roadmap.description}
+                            </p>
+                        </div>
+
+                        <div style={{ marginTop: 'auto' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+                                <span className="t-label">Progress</span>
+                                <span className="badge">{getProgress(roadmap.steps)}%</span>
+                            </div>
+                            <div style={{ height: 4, background: 'var(--border-subtle)', borderRadius: 99, marginBottom: 24 }}>
+                                <div style={{ width: `${getProgress(roadmap.steps)}%`, height: '100%', background: roadmap.color, borderRadius: 99 }} />
                             </div>
 
-                            {/* Right: Content */}
-                            <div style={{ flex: 1 }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: 8 }}>
-                                    <div>
-                                        <h3>{roadmap.title}</h3>
-                                        <p style={{ color: 'var(--color-muted)', fontSize: 14 }}>{roadmap.description}</p>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                                {roadmap.steps.slice(0, 3).map((step, i) => (
+                                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12, fontSize: 13, color: step.completed ? 'var(--text-primary)' : 'var(--text-tertiary)' }}>
+                                        {step.completed ? (
+                                            <FiCheck color="var(--color-gold-buff)" />
+                                        ) : (
+                                            <FiCircle size={10} style={{ margin: 2 }} />
+                                        )}
+                                        <span style={{ textDecoration: step.completed ? 'line-through' : 'none' }}>{step.title}</span>
                                     </div>
-                                    <span className="tag tag-primary">{getProgress(roadmap.steps)}%</span>
-                                </div>
-
-                                {/* Progress Bar */}
-                                <div style={{
-                                    height: 4,
-                                    background: 'var(--color-silver)',
-                                    borderRadius: 999,
-                                    marginBottom: 16,
-                                    overflow: 'hidden'
-                                }}>
-                                    <div style={{
-                                        width: `${getProgress(roadmap.steps)}%`,
-                                        height: '100%',
-                                        background: roadmap.color,
-                                        transition: 'width 0.3s ease'
-                                    }} />
-                                </div>
-
-                                {/* Steps */}
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                                    {roadmap.steps.map((step, stepIndex) => (
-                                        <div
-                                            key={stepIndex}
-                                            style={{
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: 12,
-                                                padding: '8px 12px',
-                                                background: step.completed ? 'rgba(244, 81, 28, 0.05)' : 'var(--color-silver)',
-                                                borderRadius: 8
-                                            }}
-                                        >
-                                            <div style={{
-                                                width: 20,
-                                                height: 20,
-                                                borderRadius: '50%',
-                                                border: `2px solid ${step.completed ? roadmap.color : 'var(--color-muted)'}`,
-                                                background: step.completed ? roadmap.color : 'transparent',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center'
-                                            }}>
-                                                {step.completed && <FiCheck size={12} color="white" />}
-                                            </div>
-                                            <span style={{
-                                                color: step.completed ? 'var(--color-dark)' : 'var(--color-muted)',
-                                                textDecoration: step.completed ? 'line-through' : 'none'
-                                            }}>
-                                                {step.title}
-                                            </span>
-                                        </div>
-                                    ))}
-                                </div>
+                                ))}
+                                {roadmap.steps.length > 3 && (
+                                    <div style={{ paddingLeft: 24, fontSize: 12, color: 'var(--text-tertiary)' }}>
+                                        + {roadmap.steps.length - 3} more steps
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </motion.div>
                 ))}
             </div>
 
-            <p style={{ color: 'var(--color-muted)', fontSize: 14, marginTop: 32, textAlign: 'center' }}>
-                More roadmaps coming soon! 🚀
-            </p>
+            <div style={{ textAlign: 'center', marginTop: 64, color: 'var(--text-tertiary)' }}>
+                <p>New architectural blueprints are being drafted.</p>
+            </div>
         </div>
     );
 };
