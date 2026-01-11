@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
+import { GoogleLogin } from '@react-oauth/google';
 
 const Login = () => {
     const navigate = useNavigate();
-    const { login, isAuthenticated } = useAuth();
+    const { login, loginWithGoogle, isAuthenticated } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
@@ -241,6 +242,35 @@ const Login = () => {
                         >
                             {loading ? 'Authenticating...' : 'Sign In'}
                         </motion.button>
+
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 16, margin: '16px 0' }}>
+                            <div style={{ flex: 1, height: 1, background: 'var(--border-prominent)' }} />
+                            <span style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>OR</span>
+                            <div style={{ flex: 1, height: 1, background: 'var(--border-prominent)' }} />
+                        </div>
+
+                        <div style={{ display: 'flex', justifyContent: 'center' }}>
+                            <GoogleLogin
+                                onSuccess={async (credentialResponse) => {
+                                    try {
+                                        setLoading(true);
+                                        await loginWithGoogle(credentialResponse.credential);
+                                        navigate('/');
+                                    } catch (error) {
+                                        console.error('Google Login Error:', error);
+                                        // You could set an error state here to show to user
+                                    } finally {
+                                        setLoading(false);
+                                    }
+                                }}
+                                onError={() => {
+                                    console.log('Login Failed');
+                                }}
+                                theme="filled_black"
+                                shape="pill"
+                                width="300"
+                            />
+                        </div>
 
                         <div style={{ textAlign: 'center', marginTop: 16 }}>
                             <span style={{ color: 'var(--text-tertiary)', fontSize: 14 }}>Don't have an account? </span>

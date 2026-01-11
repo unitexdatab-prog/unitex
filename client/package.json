@@ -9,6 +9,8 @@
         "preview": "vite preview"
     },
     "dependencies": {
+        "@fontsource/geist-sans": "^5.2.5",
+        "@react-oauth/google": "^0.13.4",
         "framer-motion": "^12.24.10",
         "lucide-react": "^0.562.0",
         "react": "^18.2.0",

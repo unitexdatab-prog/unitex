@@ -3,7 +3,7 @@
    High-End Product Design | Architectural Minimalism | Physics-based Motion
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap');
 
 :root {
     /* 
@@ -48,7 +48,7 @@
 
     /* Typography - The "Gallery" Scale */
     --font-serif: 'Playfair Display', serif;
-    --font-sans: 'Plus Jakarta Sans', sans-serif;
+    --font-sans: 'Geist Sans', sans-serif;
 
     /* Layout & Spacing - 4px Baseline Grid */
     --unit: 4px;

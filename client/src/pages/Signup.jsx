@@ -3,10 +3,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiCheck, FiArrowRight, FiArrowLeft, FiUser, FiMail, FiLock, FiCode } from 'react-icons/fi';
+import { GoogleLogin } from '@react-oauth/google';
 
 const Signup = () => {
     const navigate = useNavigate();
-    const { signup, sendOTP, verifyOTP, isAuthenticated } = useAuth();
+    const { signup, sendOTP, verifyOTP, loginWithGoogle, isAuthenticated } = useAuth();
 
     const [step, setStep] = useState(1); // 1: Email, 2: OTP, 3: Profile
     const [email, setEmail] = useState('');
@@ -139,6 +140,35 @@ const Signup = () => {
                                 exit={{ opacity: 0, x: -20 }}
                                 onSubmit={handleSendOTP}
                             >
+                                <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 24 }}>
+                                    <GoogleLogin
+                                        onSuccess={async (credentialResponse) => {
+                                            try {
+                                                setLoading(true);
+                                                await loginWithGoogle(credentialResponse.credential);
+                                                navigate('/');
+                                            } catch (error) {
+                                                console.error('Google Signup Error:', error);
+                                                setError('Google Signup Failed');
+                                            } finally {
+                                                setLoading(false);
+                                            }
+                                        }}
+                                        onError={() => {
+                                            console.log('Signup Failed');
+                                        }}
+                                        text="signup_with"
+                                        theme="filled_black"
+                                        shape="pill"
+                                        width="300"
+                                    />
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 24 }}>
+                                    <div style={{ flex: 1, height: 1, background: 'var(--border-prominent)' }} />
+                                    <span style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>OR EMAIL</span>
+                                    <div style={{ flex: 1, height: 1, background: 'var(--border-prominent)' }} />
+                                </div>
+
                                 <h2 className="t-headline-2" style={{ fontSize: '2rem', marginBottom: 8 }}>Get Started</h2>
                                 <p style={{ color: 'var(--text-secondary)', marginBottom: 32 }}>Enter your email to verify your identity.</p>
 

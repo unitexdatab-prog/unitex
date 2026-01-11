@@ -225,24 +225,66 @@ router.post('/login', async (req, res) => {
     }
 });
 
-// Verify token / Get current user
-router.get('/me', authMiddleware, async (req, res) => {
+// Google Login
+router.post('/google-login', async (req, res) => {
+    const { token } = req.body;
     const pool = req.app.locals.pool;
 
     try {
-        const result = await pool.query(
-            'SELECT id, email, name, user_id, bio, avatar_url, xp, referral_code FROM users WHERE id = $1',
-            [req.userId]
-        );
+        // Verify token with Google
+        const googleResponse = await fetch(`https://oauth2.googleapis.com/tokeninfo?id_token=${token}`);
+        const googleData = await googleResponse.json();
 
-        if (result.rows.length === 0) {
-            return res.status(404).json({ error: 'User not found' });
+        if (googleData.error) {
+            return res.status(400).json({ error: 'Invalid Google token' });
         }
 
-        res.json({ user: result.rows[0] });
+        const { email, name, sub: googleUserId, picture } = googleData;
+
+        // Check if user exists
+        let userResult = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
+        let user = userResult.rows[0];
+        let isNewUser = false;
+
+        if (!user) {
+            // Create new user
+            const userId = generateUserId();
+            const referralCode = generateReferralCode();
+            const passwordHash = await bcrypt.hash(generateOTP(), 10); // Random password
+
+            const newUser = await pool.query(
+                `INSERT INTO users (email, password_hash, name, user_id, referral_code, xp, avatar_url)
+                 VALUES ($1, $2, $3, $4, $5, $6, $7)
+                 RETURNING *`,
+                [email, passwordHash, name, userId, referralCode, 100, picture]
+            );
+            user = newUser.rows[0];
+
+            // Create default settings
+            await pool.query('INSERT INTO user_settings (user_id) VALUES ($1)', [user.id]);
+            isNewUser = true;
+        }
+
+        // Generate JWT
+        const jwtToken = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: '7d' });
+
+        res.json({
+            token: jwtToken,
+            user: {
+                id: user.id,
+                email: user.email,
+                name: user.name,
+                userId: user.user_id,
+                xp: user.xp,
+                referralCode: user.referral_code,
+                avatarUrl: user.avatar_url
+            },
+            isNewUser
+        });
+
     } catch (error) {
-        console.error('Get user error:', error);
-        res.status(500).json({ error: 'Failed to get user' });
+        console.error('Google login error:', error);
+        res.status(500).json({ error: 'Google login failed' });
     }
 });
 

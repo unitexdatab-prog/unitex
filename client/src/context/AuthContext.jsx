@@ -128,6 +128,26 @@ export const AuthProvider = ({ children }) => {
         Authorization: `Bearer ${token}`
     });
 
+    const loginWithGoogle = async (token) => {
+        const response = await fetch('/api/auth/google-login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ token })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || 'Google login failed');
+        }
+
+        localStorage.setItem('token', data.token);
+        setToken(data.token);
+        setUser(data.user);
+
+        return data;
+    };
+
     return (
         <AuthContext.Provider value={{
             user,
@@ -135,6 +155,7 @@ export const AuthProvider = ({ children }) => {
             loading,
             login,
             signup,
+            loginWithGoogle,
             sendOTP,
             verifyOTP,
             logout,
