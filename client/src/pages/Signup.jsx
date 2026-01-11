@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiCheck, FiArrowRight, FiArrowLeft, FiUser, FiMail, FiLock, FiCode } from 'react-icons/fi';
+import { FiArrowRight, FiArrowLeft, FiUser, FiMail, FiLock, FiCode } from 'react-icons/fi';
 import { GoogleLogin } from '@react-oauth/google';
 
 const Signup = () => {
